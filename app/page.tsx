@@ -52,6 +52,9 @@ export default function Home() {
       <button onClick={testTransaksiSelesai} style={{ padding: '10px 20px', fontSize: 16, marginLeft: 10 }}>
         Test Transaksi Selesai
       </button>
+      <button onClick={testHargaRekomendasi} style={{ padding: '10px 20px', fontSize: 16, marginLeft: 10 }}>
+        Test Harga Rekomendasi
+      </button>
       <pre>{result}</pre>
     </main>
   )
@@ -149,6 +152,13 @@ export default function Home() {
       harga_beli: 8500
     })
   })
+  const data = await res.json()
+  setResult(JSON.stringify(data, null, 2))
+  }
+
+  async function testHargaRekomendasi() {
+  setResult('Menghitung rekomendasi harga...')
+  const res = await fetch('/api/harga/rekomendasi?komoditas_ref=6B6142ADA0D49113')
   const data = await res.json()
   setResult(JSON.stringify(data, null, 2))
   }
