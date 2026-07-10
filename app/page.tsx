@@ -55,6 +55,12 @@ export default function Home() {
       <button onClick={testHargaRekomendasi} style={{ padding: '10px 20px', fontSize: 16, marginLeft: 10 }}>
         Test Harga Rekomendasi
       </button>
+      <button onClick={testRiwayat} style={{ padding: '10px 20px', fontSize: 16, marginLeft: 10 }}>
+        Test Riwayat
+      </button>
+      <button onClick={testPrediksi} style={{ padding: '10px 20px', fontSize: 16, marginLeft: 10 }}>
+        Test Prediksi
+      </button>
       <pre>{result}</pre>
     </main>
   )
@@ -162,5 +168,19 @@ export default function Home() {
   const data = await res.json()
   setResult(JSON.stringify(data, null, 2))
   }
+
+  async function testRiwayat() {
+  setResult('Mengambil riwayat...')
+  const res = await fetch('/api/produsen/riwayat?anggota_ref=0E465AB0EB8FAF6D')
+  const data = await res.json()
+  setResult(JSON.stringify(data, null, 2))
+  }
+  async function testPrediksi() {
+  setResult('Menghitung prediksi...')
+  const res = await fetch('/api/koperasi/prediksi?kode_wilayah=32.01.01.2001')
+  const data = await res.json()
+  setResult(JSON.stringify(data, null, 2))
+  }
+
 }
 
