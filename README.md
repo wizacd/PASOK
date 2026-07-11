@@ -3,7 +3,6 @@
 **Platform B2B Agregasi Supply dan Order Komoditas Berbasis AI untuk Rantai Distribusi Petani, Nelayan, dan Koperasi Desa Merah Putih**
 
 **Link Deploy:** [pasok-theta.vercel.app](https://pasok-theta.vercel.app/)
-**Skema Database:** [schema_pasok_supabase.sql](./schema_pasok_supabase.sql)
 
 ---
 
