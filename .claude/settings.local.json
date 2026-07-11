@@ -31,7 +31,8 @@
       "Bash(timeout 30 bash -c 'until curl -sf http://localhost:3000 >/dev/null 2>&1; do sleep 1; done')",
       "Bash(npx --yes playwright@1.61.1 screenshot --viewport-size 1440,1000 --full-page --wait-for-timeout 700 http://localhost:3000/produsen \"/tmp/produsen-dashboard.png\")",
       "Bash(node -e \"console.log\\(Object.keys\\(require\\('lucide-react'\\)\\).includes\\('ChevronRight'\\)\\)\")",
-      "Bash(npx --yes playwright@1.61.1 screenshot --viewport-size 1440,1000 --full-page --wait-for-timeout 700 http://localhost:3000/produsen/tawaran/buat \"/tmp/buat-tawaran.png\")"
+      "Bash(npx --yes playwright@1.61.1 screenshot --viewport-size 1440,1000 --full-page --wait-for-timeout 700 http://localhost:3000/produsen/tawaran/buat \"/tmp/buat-tawaran.png\")",
+      "Bash(npx --yes playwright@1.61.1 screenshot --viewport-size 1440,1000 --wait-for-timeout 700 http://localhost:3000/produsen/tawaran/buat \"/tmp/buat-tawaran-v2.png\")"
     ]
   }
 }
