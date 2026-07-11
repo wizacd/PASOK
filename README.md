@@ -1,36 +1,92 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PASOK
 
-## Getting Started
+**Platform B2B Agregasi Supply dan Order Komoditas Berbasis AI untuk Rantai Distribusi Petani, Nelayan, dan Koperasi Desa Merah Putih**
 
-First, run the development server:
+**Link Deploy:** [pasok-theta.vercel.app](https://pasok-theta.vercel.app/)
+**Dokumentasi API:** [Dokumentasi_API_PASOK.md](./Dokumentasi_API_PASOK_untuk_Person1.md)
+**Skema Database:** [schema_pasok_supabase.sql](./schema_pasok_supabase.sql)
+
+---
+
+## Latar Belakang
+
+Petani dan nelayan di Indonesia masih sangat bergantung pada tengkulak untuk menjual hasil produksinya, tanpa akses informasi harga pasar yang objektif dan tanpa rekam jejak transaksi yang bisa dipakai untuk mengajukan pembiayaan (KUR/simpan-pinjam). Di sisi lain, Koperasi Desa Merah Putih kesulitan memetakan produsen di wilayahnya, sehingga sulit merencanakan pembelian dan distribusi komoditas secara efektif.
+
+## Solusi
+
+PASOK menghubungkan petani dan nelayan langsung dengan Koperasi Desa Merah Putih sebagai agregator komoditas resmi, melalui lima fitur utama:
+
+1. **Supply Matching** — mencocokkan penawaran hasil panen dengan koperasi terdekat secara otomatis berdasarkan komoditas, volume, dan jarak.
+2. **Peta Sebaran Komoditas** — memetakan produsen, jenis komoditas, dan estimasi stok di suatu wilayah secara real-time.
+3. **Rekomendasi Harga Berbasis AI** — menggabungkan data harga acuan pemerintah (Badan Pangan Nasional) dengan rata-rata harga transaksi lokal.
+4. **E-Surat Jalan & Riwayat Transaksi** — menghasilkan bukti transaksi digital otomatis sebagai rekam jejak finansial untuk mempermudah akses pembiayaan.
+5. **Prediksi Pasokan** — menganalisis data penawaran aktif untuk memperkirakan volume komoditas pada periode mendatang.
+
+### Kebaruan
+
+PASOK tidak sekadar memotong rantai pasok, tetapi mengubah kebiasaan transaksi tunai yang tidak tercatat menjadi rekam jejak finansial digital. Skema database dirancang selaras dengan skema sistem resmi Koperasi Desa Merah Putih — begitu transaksi selesai, data otomatis tercatat ke tabel inventaris dan dokumen resmi koperasi, bukan berdiri sebagai sistem terpisah.
+
+---
+
+## Tech Stack
+
+| Layer | Teknologi |
+|---|---|
+| Frontend | Next.js (App Router), React, Tailwind CSS |
+| Backend | Next.js API Routes |
+| Database & Auth | Supabase (PostgreSQL + PostGIS) |
+| Hosting | Vercel |
+
+## Status Implementasi
+
+Seluruh **backend dan business logic sudah selesai diimplementasikan dan diuji**, mencakup 9 endpoint API yang menjalankan alur inti end-to-end: registrasi produsen & koperasi, input penawaran, peta sebaran, supply matching (skoring jarak + kategori + volume), rekomendasi harga (kombinasi data resmi + pasar lokal), penerimaan matching, transaksi selesai dengan e-surat jalan otomatis, riwayat transaksi, dan prediksi pasokan.
+
+Integrasi antarmuka pengguna (UI) untuk producer app dan koperasi dashboard sedang dalam tahap penyelesaian. Fungsi backend dapat diverifikasi langsung melalui endpoint API sesuai dokumentasi terlampir.
+
+---
+
+## Cara Menjalankan (Lokal)
+
+### 1. Clone repo
+
+```bash
+git clone https://github.com/wizacd/PASOK.git
+cd PASOK
+npm install
+```
+
+### 2. Buat file `.env.local`
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_xxxxx
+SUPABASE_SECRET_KEY=sb_secret_xxxxx
+```
+
+### 3. Jalankan development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Buka [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Setup Database
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Jalankan seluruh isi file `schema_pasok_supabase.sql` di **Supabase SQL Editor** (New Query → paste → Run) pada project Supabase baru. File ini membuat seluruh tabel, Row Level Security policy, dan seed data awal.
 
-## Learn More
+## Deploy ke Vercel
 
-To learn more about Next.js, take a look at the following resources:
+1. Import repo ini di [vercel.com](https://vercel.com) (framework Next.js terdeteksi otomatis)
+2. Tambahkan 3 environment variable yang sama seperti `.env.local`
+3. Deploy — setiap push ke branch `main` otomatis memicu re-deploy
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Tim
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Peran | Nama |
+|---|---|
+| Backend & Database | Nadzira |
+| Frontend & UX | ALiyyah |
+| AI/Data Logic & Product | Chinthya |
