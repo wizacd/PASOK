@@ -1,7 +1,37 @@
 {
   "permissions": {
     "allow": [
-      "Bash(powershell -Command \"Start-Sleep -Seconds 1\")"
+      "Bash(powershell -Command \"Start-Sleep -Seconds 1\")",
+      "Bash(npm install *)",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(curl -s -o /tmp_response.html -w \"HTTP %{http_code}\\\\n\" http://localhost:3000/onboarding/produsen)",
+      "Bash(wc -l /tmp_response.html)",
+      "Bash(curl *)",
+      "mcp__plugin_figma_figma__get_design_context",
+      "Skill(run)",
+      "Bash(npx playwright *)",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(pkill -f \"npm run dev\")",
+      "mcp__plugin_figma_figma__get_metadata",
+      "Bash(python3 *)",
+      "Bash(npx eslint *)",
+      "Bash(npx --yes playwright@1.61.1 screenshot --full-page --wait-for-timeout 300 http://localhost:3000 \"/tmp/splash.png\")",
+      "Bash(npx --yes playwright@1.61.1 screenshot --full-page --wait-for-timeout 500 http://localhost:3000/pilih-peran \"/tmp/pilih-peran.png\")",
+      "Bash(netstat -ano)",
+      "Bash(taskkill //PID 33976 //F)",
+      "Bash(taskkill //PID 24376 //F)",
+      "Bash(npx --yes playwright@1.61.1 screenshot --full-page --wait-for-timeout 500 http://localhost:3000/pilih-peran \"/tmp/pilih-peran-v2.png\")",
+      "Bash(awk '{print $5}')",
+      "Bash(xargs -r -I{} taskkill //PID {} //F)",
+      "Bash(node -e ' *)",
+      "Bash(npx --yes playwright@1.61.1 screenshot --viewport-size 1440,900 --wait-for-timeout 600 http://localhost:3000/login \"/tmp/login.png\")",
+      "Bash(npx --yes playwright@1.61.1 screenshot --viewport-size 1440,900 --wait-for-selector 'button[aria-label=\"Tampilkan kata sandi\"]' \"/tmp/login-pretoggle.png\" http://localhost:3000/login)",
+      "Bash(npx --yes playwright@1.61.1 screenshot --viewport-size 390,844 --wait-for-timeout 400 http://localhost:3000/login \"/tmp/login-mobile.png\")",
+      "Bash(timeout 30 bash -c 'until curl -sf http://localhost:3000 >/dev/null 2>&1; do sleep 1; done')",
+      "Bash(npx --yes playwright@1.61.1 screenshot --viewport-size 1440,1000 --full-page --wait-for-timeout 700 http://localhost:3000/produsen \"/tmp/produsen-dashboard.png\")",
+      "Bash(node -e \"console.log\\(Object.keys\\(require\\('lucide-react'\\)\\).includes\\('ChevronRight'\\)\\)\")",
+      "Bash(npx --yes playwright@1.61.1 screenshot --viewport-size 1440,1000 --full-page --wait-for-timeout 700 http://localhost:3000/produsen/tawaran/buat \"/tmp/buat-tawaran.png\")"
     ]
   }
 }
