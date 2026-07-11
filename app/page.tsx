@@ -175,9 +175,26 @@ export default function Home() {
   const data = await res.json()
   setResult(JSON.stringify(data, null, 2))
   }
+
   async function testPrediksi() {
   setResult('Menghitung prediksi...')
   const res = await fetch('/api/koperasi/prediksi?kode_wilayah=32.01.01.2001')
+  const data = await res.json()
+  setResult(JSON.stringify(data, null, 2))
+  }
+
+  async function testRegisterLoginKoperasi() {
+  setResult('Membuat akun login koperasi...')
+  const res = await fetch('/api/koperasi/auth/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      username: 'juri_koperasi',
+      password: 'demo12345',
+      koperasi_ref: 'KOP-388910EE548D6A22',
+      name: 'Koperasi Desa Bendungan'
+    })
+  })
   const data = await res.json()
   setResult(JSON.stringify(data, null, 2))
   }
