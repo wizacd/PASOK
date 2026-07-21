@@ -1,7 +1,7 @@
 "use client";
 
 import { MapPin, MessageCircle, Phone, User, X } from "lucide-react";
-import type { ProducerPin } from "@/components/koperasi/peta-sebaran/distribution-map";
+import type { ProducerPin } from "@/components/koperasi/peta-sebaran/producer-data";
 
 const STATUS_STYLES: Record<ProducerPin["status"], string> = {
   Tersedia: "bg-success/10 text-success",

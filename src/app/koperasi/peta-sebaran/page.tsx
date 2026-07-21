@@ -6,14 +6,14 @@ import { RequireAuth } from "@/components/auth/require-auth";
 import { DashboardSidebar } from "@/components/koperasi/dashboard/dashboard-sidebar";
 import { DashboardTopBar } from "@/components/koperasi/dashboard/dashboard-top-bar";
 import {
-  PRODUCER_PINS,
-  type ProducerPin,
-} from "@/components/koperasi/peta-sebaran/distribution-map";
-import {
   FilterPanel,
   type FilterState,
 } from "@/components/koperasi/peta-sebaran/filter-panel";
 import { MapLegend } from "@/components/koperasi/peta-sebaran/map-legend";
+import {
+  PRODUCER_PINS,
+  type ProducerPin,
+} from "@/components/koperasi/peta-sebaran/producer-data";
 import { ProducerDetailDrawer } from "@/components/koperasi/peta-sebaran/producer-detail-drawer";
 
 const DistributionMap = dynamic(
