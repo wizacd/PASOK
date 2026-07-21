@@ -4,6 +4,7 @@ const FAKE_EMAIL_DOMAIN = 'pasok.local'
 
 const DASHBOARD_PATHS = {
   produsen: '/produsen',
+  koperasi: '/koperasi',
 }
 
 export async function signIn(identifier, password) {
