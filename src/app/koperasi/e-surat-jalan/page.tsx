@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Calendar, Clock, MapPin, Printer, Save, Truck, UserCheck } from "lucide-react";
+import { Clock, MapPin, Printer, Save, Truck, UserCheck } from "lucide-react";
 import { RequireAuth } from "@/components/auth/require-auth";
 import { DashboardSidebar } from "@/components/koperasi/dashboard/dashboard-sidebar";
 import { DashboardTopBar } from "@/components/koperasi/dashboard/dashboard-top-bar";
@@ -64,19 +64,13 @@ export default function ESuratJalanPage() {
                     >
                       Tanggal &amp; Waktu Pemuatan
                     </label>
-                    <div className="relative">
-                      <Calendar
-                        className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-body"
-                        strokeWidth={2}
-                      />
-                      <input
-                        id="tanggal-muat"
-                        type="datetime-local"
-                        value={tanggalMuat}
-                        onChange={(event) => setTanggalMuat(event.target.value)}
-                        className="h-12 w-full rounded-xs border border-border-soft px-4 text-base text-ink focus:border-info focus:outline-none"
-                      />
-                    </div>
+                    <input
+                      id="tanggal-muat"
+                      type="datetime-local"
+                      value={tanggalMuat}
+                      onChange={(event) => setTanggalMuat(event.target.value)}
+                      className="h-12 w-full rounded-xs border border-border-soft px-4 text-base text-ink focus:border-info focus:outline-none"
+                    />
                   </div>
 
                   <div className="grid grid-cols-2 gap-6">
