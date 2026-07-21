@@ -3,10 +3,33 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowRight, Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { signIn, getRole, getDashboardPath } from "@/lib/auth";
 
 export function LoginForm() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      const { user } = await signIn(identifier, password);
+      const role = getRole(user);
+      router.push(getDashboardPath(role));
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Gagal masuk. Periksa kembali data Anda.";
+      setError(message);
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="flex flex-1 items-center justify-center bg-canvas p-8">
@@ -30,10 +53,7 @@ export function LoginForm() {
           </div>
         </div>
 
-        <form
-          onSubmit={(event) => event.preventDefault()}
-          className="flex flex-col gap-6"
-        >
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           <div className="flex flex-col gap-4">
             <div className="flex flex-col">
               <label
@@ -53,6 +73,8 @@ export function LoginForm() {
                   type="text"
                   autoComplete="username"
                   placeholder="Contoh: manager@coop.id"
+                  value={identifier}
+                  onChange={(event) => setIdentifier(event.target.value)}
                   className="h-12 w-full rounded-sm border border-border-soft bg-white pl-10 pr-4 text-base text-ink placeholder:text-body/70 focus:border-brand focus:outline-none"
                 />
               </div>
@@ -84,6 +106,8 @@ export function LoginForm() {
                   type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   placeholder="••••••••"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
                   className="h-12 w-full rounded-sm border border-border-soft bg-white pl-10 pr-11 text-base text-ink placeholder:text-body/70 focus:border-brand focus:outline-none"
                 />
                 <button
@@ -113,11 +137,18 @@ export function LoginForm() {
             Ingat saya untuk login berikutnya
           </label>
 
+          {error ? (
+            <p className="text-sm text-danger" role="alert">
+              {error}
+            </p>
+          ) : null}
+
           <button
             type="submit"
-            className="flex h-14 w-full items-center justify-center gap-2 rounded-sm bg-brand-deep text-xl font-semibold text-white shadow-[0px_1px_1px_rgba(0,0,0,0.05)] transition-opacity hover:opacity-90"
+            disabled={loading}
+            className="flex h-14 w-full items-center justify-center gap-2 rounded-sm bg-brand-deep text-xl font-semibold text-white shadow-[0px_1px_1px_rgba(0,0,0,0.05)] transition-opacity hover:opacity-90 disabled:opacity-60"
           >
-            Masuk Sekarang
+            {loading ? "Memproses..." : "Masuk Sekarang"}
             <ArrowRight className="size-4" strokeWidth={2.5} />
           </button>
         </form>
