@@ -155,7 +155,7 @@ export function LoginForm() {
 
         <div className="flex gap-1 border-t border-border-soft pt-8 text-sm">
           <span className="text-body">Belum punya akun?</span>
-          <Link href="/onboarding/koperasi" className="font-bold text-brand">
+          <Link href="/koperasi/register" className="font-bold text-brand">
             Daftar Koperasi Baru
           </Link>
         </div>
