@@ -24,7 +24,7 @@ const ROLES: Role[] = [
     iconBgClassName: "bg-role-koperasi-soft/30",
     accentClassName: "text-role-koperasi",
     ctaLabel: "Mulai sebagai Koperasi",
-    href: "/onboarding/koperasi",
+    href: "/login",
   },
 ];
 
