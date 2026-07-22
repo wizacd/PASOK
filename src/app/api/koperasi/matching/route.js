@@ -17,6 +17,13 @@ export async function GET(request) {
     .single()
   if (errKop) return Response.json({ error: errKop.message }, { status: 400 })
 
+  if (!koperasiRow.koordinat_dibulatkan) {
+    return Response.json(
+      { error: 'Koperasi ini belum punya data koordinat lokasi, jadi supply matching belum bisa dihitung.' },
+      { status: 422 }
+    )
+  }
+
   const [kopLat, kopLng] = koperasiRow.koordinat_dibulatkan.split(',').map(v => parseFloat(v.trim()))
   const kodeWilayah = koperasiRow.referensi_koperasi_wilayah.kode_wilayah
 
@@ -29,7 +36,7 @@ export async function GET(request) {
   const { data: penawaranList, error: errPenawaran } = await supabase
     .from('penawaran')
     .select(`
-      id, estimasi_volume, harga_ditawarkan, estimasi_tanggal_panen,
+      id, estimasi_volume, harga_ditawarkan, estimasi_tanggal_panen, komoditas_ref,
       anggota_koperasi ( nama, anggota_lokasi ( lokasi_lat, lokasi_lng ) ),
       referensi_komoditas_desa ( nama_komoditas )
     `)
