@@ -2,17 +2,19 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import {
-  CircleUserRound,
-  History,
+  Archive,
+  HelpCircle,
   LayoutDashboard,
-  PlusCircle,
-  Receipt,
-  Settings,
-  Tag,
+  LogOut,
+  Sailboat,
+  Store,
+  Truck,
   type LucideIcon,
 } from "lucide-react";
+import { signOut } from "@/lib/auth";
 
 type NavItem = {
   href: string;
@@ -22,18 +24,24 @@ type NavItem = {
 
 const NAV_ITEMS: NavItem[] = [
   { href: "/produsen", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/produsen/harga", label: "Harga", icon: Tag },
-  { href: "/produsen/transaksi", label: "Transaksi", icon: Receipt },
-  { href: "/produsen/riwayat", label: "Riwayat", icon: History },
-  { href: "/produsen/pengaturan", label: "Pengaturan", icon: Settings },
+  { href: "/produsen/inventory", label: "Inventory", icon: Archive },
+  { href: "/produsen/logistics", label: "Logistics", icon: Truck },
+  { href: "/produsen/maritime", label: "Maritime", icon: Sailboat },
+  { href: "/produsen/marketplace", label: "Marketplace", icon: Store },
 ];
 
 export function SidebarNav() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  async function handleSignOut() {
+    await signOut();
+    router.push("/login");
+  }
 
   return (
-    <aside className="sticky top-0 flex h-screen w-64 shrink-0 flex-col justify-between border-r border-border-soft bg-canvas py-8">
-      <div className="flex flex-col gap-8">
+    <aside className="sticky top-0 flex h-screen w-64 shrink-0 flex-col justify-between border-r border-border-soft bg-white py-6">
+      <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-4 px-6">
           <Image
             src="/logo-pasok.png"
@@ -47,13 +55,13 @@ export function SidebarNav() {
             <span className="text-[32px] font-bold leading-10 tracking-[-0.32px] text-brand">
               PASOK
             </span>
-            <span className="text-xs font-semibold uppercase tracking-[0.6px] text-ink">
+            <span className="text-xs font-semibold uppercase tracking-[0.6px] text-info-deep">
               Producer Portal
             </span>
           </div>
         </div>
 
-        <nav className="flex flex-col gap-1 px-2">
+        <nav className="flex flex-1 flex-col gap-1 px-4">
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
@@ -62,10 +70,10 @@ export function SidebarNav() {
                 key={item.href}
                 href={item.href}
                 aria-current={isActive ? "page" : undefined}
-                className={`flex items-center gap-4 rounded-sm py-3 pl-4 pr-5 text-xs font-semibold uppercase tracking-[0.6px] ${
+                className={`flex items-center gap-3 rounded-xs px-3 py-2.5 text-xs font-semibold tracking-[0.6px] ${
                   isActive
-                    ? "border-r-4 border-brand bg-chip text-brand"
-                    : "text-ink hover:bg-white"
+                    ? "bg-brand text-white"
+                    : "text-body hover:bg-canvas"
                 }`}
               >
                 <Icon className="size-[18px]" strokeWidth={2} />
@@ -73,34 +81,25 @@ export function SidebarNav() {
               </Link>
             );
           })}
-
-          <div className="mt-4 flex flex-col gap-1 border-t border-border-soft pt-4">
-            <Link
-              href="/produsen/pengaturan"
-              className="flex items-center gap-3 rounded-sm px-4 py-3 text-xs font-semibold uppercase tracking-[0.6px] text-body hover:bg-white"
-            >
-              <Settings className="size-5" strokeWidth={2} />
-              Pengaturan
-            </Link>
-            <Link
-              href="/produsen/profil"
-              className="flex items-center gap-3 rounded-sm px-4 py-3 text-xs font-semibold uppercase tracking-[0.6px] text-danger hover:bg-white"
-            >
-              <CircleUserRound className="size-[18px]" strokeWidth={2} />
-              Profil
-            </Link>
-          </div>
         </nav>
       </div>
 
-      <div className="px-4">
-        <Link
-          href="/produsen/tawaran/buat"
-          className="flex items-center justify-center gap-2 rounded-sm bg-brand py-3 text-base font-bold text-white shadow-[0px_1px_1px_rgba(0,0,0,0.05)] transition-opacity hover:opacity-90"
+      <div className="flex flex-col gap-1 border-t border-border-soft px-4 pt-6">
+        <button
+          type="button"
+          className="flex items-center gap-3 rounded-xs px-3 py-2.5 text-left text-xs font-semibold tracking-[0.6px] text-body hover:bg-canvas"
         >
-          <PlusCircle className="size-5" strokeWidth={2} />
-          Buat Tawaran Baru
-        </Link>
+          <HelpCircle className="size-5" strokeWidth={2} />
+          Help Center
+        </button>
+        <button
+          type="button"
+          onClick={handleSignOut}
+          className="flex items-center gap-3 rounded-xs px-3 py-2.5 text-left text-xs font-semibold tracking-[0.6px] text-body hover:bg-canvas"
+        >
+          <LogOut className="size-[18px]" strokeWidth={2} />
+          Sign Out
+        </button>
       </div>
     </aside>
   );

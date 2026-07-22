@@ -57,7 +57,9 @@
       "Bash(supabase --version)",
       "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>console.log\\(JSON.parse\\(d\\).id\\)\\)\")",
       "Bash(echo \"EXIT CODE: $?\")",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Bash(echo \"EXIT: $?\")",
+      "mcp__figma-desktop__get_metadata"
     ]
   }
 }
