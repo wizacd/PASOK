@@ -7,7 +7,11 @@ import { useRouter } from "next/navigation";
 import { ArrowRight, Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { signIn, getRole, getDashboardPath } from "@/lib/auth";
 
-export function LoginForm() {
+type LoginFormProps = {
+  role?: "produsen" | "koperasi";
+};
+
+export function LoginForm({ role = "koperasi" }: LoginFormProps) {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [identifier, setIdentifier] = useState("");
@@ -48,7 +52,9 @@ export function LoginForm() {
               Selamat Datang Kembali
             </h1>
             <p className="text-base leading-6 text-body">
-              Masuk ke Portal Hub Koperasi Agri-Maritim Anda.
+              {role === "produsen"
+                ? "Masuk ke Portal Produsen PASOK Anda."
+                : "Masuk ke Portal Hub Koperasi Agri-Maritim Anda."}
             </p>
           </div>
         </div>
@@ -155,9 +161,15 @@ export function LoginForm() {
 
         <div className="flex gap-1 border-t border-border-soft pt-8 text-sm">
           <span className="text-body">Belum punya akun?</span>
-          <Link href="/koperasi/register" className="font-bold text-brand">
-            Daftar Koperasi Baru
-          </Link>
+          {role === "produsen" ? (
+            <Link href="/onboarding/produsen" className="font-bold text-brand">
+              Daftar sebagai Produsen
+            </Link>
+          ) : (
+            <Link href="/koperasi/register" className="font-bold text-brand">
+              Daftar Koperasi Baru
+            </Link>
+          )}
         </div>
       </div>
     </div>

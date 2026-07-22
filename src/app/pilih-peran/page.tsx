@@ -13,7 +13,7 @@ const ROLES: Role[] = [
     iconBgClassName: "bg-role-produsen-soft/30",
     accentClassName: "text-role-produsen",
     ctaLabel: "Mulai sebagai Produsen",
-    href: "/onboarding/produsen",
+    href: "/login?role=produsen",
   },
   {
     id: "koperasi",
@@ -24,7 +24,7 @@ const ROLES: Role[] = [
     iconBgClassName: "bg-role-koperasi-soft/30",
     accentClassName: "text-role-koperasi",
     ctaLabel: "Mulai sebagai Koperasi",
-    href: "/login",
+    href: "/login?role=koperasi",
   },
 ];
 

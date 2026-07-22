@@ -1,10 +1,17 @@
 import { LoginForm } from "@/components/login/login-form";
 import { LoginHero } from "@/components/login/login-hero";
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ role?: string }>;
+}) {
+  const { role } = await searchParams;
+  const isProdusen = role === "produsen";
+
   return (
     <div className="flex min-h-screen w-full items-stretch">
-      <LoginForm />
+      <LoginForm role={isProdusen ? "produsen" : "koperasi"} />
       <LoginHero />
     </div>
   );
