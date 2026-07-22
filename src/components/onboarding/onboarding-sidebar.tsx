@@ -6,9 +6,10 @@ export type OnboardingStep = {
 };
 
 const STEPS: OnboardingStep[] = [
-  { number: 1, title: "Komoditas" },
+  { number: 1, title: "Akun" },
   { number: 2, title: "Lokasi" },
-  { number: 3, title: "Kapasitas" },
+  { number: 3, title: "Komoditas" },
+  { number: 4, title: "Kapasitas" },
 ];
 
 export function OnboardingSidebar({ currentStep }: { currentStep: number }) {
