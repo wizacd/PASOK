@@ -5,13 +5,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import {
-  Archive,
   HelpCircle,
+  History,
   LayoutDashboard,
   LogOut,
-  Sailboat,
-  Store,
-  Truck,
+  Receipt,
+  Settings,
+  Tag,
   type LucideIcon,
 } from "lucide-react";
 import { signOut } from "@/lib/auth";
@@ -24,10 +24,10 @@ type NavItem = {
 
 const NAV_ITEMS: NavItem[] = [
   { href: "/produsen", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/produsen/inventory", label: "Inventory", icon: Archive },
-  { href: "/produsen/logistics", label: "Logistics", icon: Truck },
-  { href: "/produsen/maritime", label: "Maritime", icon: Sailboat },
-  { href: "/produsen/marketplace", label: "Marketplace", icon: Store },
+  { href: "/produsen/harga", label: "Harga", icon: Tag },
+  { href: "/produsen/tawaran/buat", label: "Transaksi", icon: Receipt },
+  { href: "/produsen/riwayat", label: "Riwayat", icon: History },
+  { href: "/produsen/pengaturan", label: "Pengaturan", icon: Settings },
 ];
 
 export function SidebarNav() {
@@ -56,7 +56,7 @@ export function SidebarNav() {
               PASOK
             </span>
             <span className="text-xs font-semibold uppercase tracking-[0.6px] text-info-deep">
-              Producer Portal
+              Portal Produsen
             </span>
           </div>
         </div>
@@ -90,7 +90,7 @@ export function SidebarNav() {
           className="flex items-center gap-3 rounded-xs px-3 py-2.5 text-left text-xs font-semibold tracking-[0.6px] text-body hover:bg-canvas"
         >
           <HelpCircle className="size-5" strokeWidth={2} />
-          Help Center
+          Pusat Bantuan
         </button>
         <button
           type="button"
@@ -98,7 +98,7 @@ export function SidebarNav() {
           className="flex items-center gap-3 rounded-xs px-3 py-2.5 text-left text-xs font-semibold tracking-[0.6px] text-body hover:bg-canvas"
         >
           <LogOut className="size-[18px]" strokeWidth={2} />
-          Sign Out
+          Keluar
         </button>
       </div>
     </aside>
