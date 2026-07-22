@@ -1,6 +1,14 @@
 import { Info, TrendingUp } from "lucide-react";
 
-export function TotalAccumulationCard() {
+function formatRupiah(value: number) {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+export function TotalAccumulationCard({ totalRupiah }: { totalRupiah: number }) {
   return (
     <div className="relative col-span-2 flex flex-col gap-4 overflow-hidden rounded-lg border border-border-soft bg-white p-6">
       <div
@@ -11,16 +19,12 @@ export function TotalAccumulationCard() {
       <div className="relative flex items-center gap-2">
         <TrendingUp className="size-[18px] text-body" strokeWidth={2} />
         <span className="text-base uppercase tracking-[0.8px] text-body">
-          Total Akumulasi Transaksi
+          Total Akumulasi Transaksi Selesai
         </span>
       </div>
 
       <div className="relative flex items-center gap-3">
-        <span className="text-base text-forest">Rp 142.500.000</span>
-        <span className="flex items-center gap-1 rounded-xs bg-success/10 px-2 py-1 text-[11px] font-bold text-success">
-          <TrendingUp className="size-[11px]" strokeWidth={2.5} />
-          +12.5%
-        </span>
+        <span className="text-base text-forest">{formatRupiah(totalRupiah)}</span>
       </div>
 
       <div className="relative flex max-w-[512px] items-start gap-3 rounded-sm border border-border-soft/50 bg-chip p-4">
