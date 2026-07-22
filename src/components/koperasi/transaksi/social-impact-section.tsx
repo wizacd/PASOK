@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Map } from "lucide-react";
 
 export function SocialImpactSection() {
@@ -40,13 +41,13 @@ export function SocialImpactSection() {
           Penyebaran Regional Dampak
         </span>
         <div className="relative flex h-48 items-center justify-center overflow-hidden rounded-xs bg-chip">
-          <button
-            type="button"
+          <Link
+            href="/koperasi/peta-sebaran"
             className="flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-base text-forest shadow-md"
           >
             <Map className="size-[18px]" strokeWidth={2} />
             Buka Visualisasi Geografis
-          </button>
+          </Link>
         </div>
       </div>
     </div>
