@@ -15,6 +15,10 @@ export function AkunForm() {
       setError("Lengkapi nama, email, dan kata sandi terlebih dahulu.");
       return;
     }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(wizard.email)) {
+      setError("Format email tidak valid. Contoh: budi@email.com");
+      return;
+    }
     if (wizard.password.length < 6) {
       setError("Kata sandi minimal 6 karakter.");
       return;

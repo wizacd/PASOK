@@ -1,15 +1,17 @@
+import Link from "next/link";
 import { ShieldCheck } from "lucide-react";
 
 export type OnboardingStep = {
   number: number;
   title: string;
+  href: string;
 };
 
 const STEPS: OnboardingStep[] = [
-  { number: 1, title: "Akun" },
-  { number: 2, title: "Lokasi" },
-  { number: 3, title: "Komoditas" },
-  { number: 4, title: "Kapasitas" },
+  { number: 1, title: "Akun", href: "/onboarding/produsen" },
+  { number: 2, title: "Lokasi", href: "/onboarding/produsen/lokasi" },
+  { number: 3, title: "Komoditas", href: "/onboarding/produsen/komoditas" },
+  { number: 4, title: "Kapasitas", href: "/onboarding/produsen/kapasitas" },
 ];
 
 export function OnboardingSidebar({ currentStep }: { currentStep: number }) {
@@ -28,9 +30,10 @@ export function OnboardingSidebar({ currentStep }: { currentStep: number }) {
         {STEPS.map((step) => {
           const isActive = step.number === currentStep;
           return (
-            <div
+            <Link
               key={step.number}
-              className={`flex items-center gap-4 ${isActive ? "" : "opacity-50"}`}
+              href={step.href}
+              className={`flex items-center gap-4 rounded-xs transition-opacity hover:opacity-100 ${isActive ? "" : "opacity-50"}`}
               aria-current={isActive ? "step" : undefined}
             >
               <div
@@ -50,7 +53,7 @@ export function OnboardingSidebar({ currentStep }: { currentStep: number }) {
                   {step.title}
                 </span>
               </div>
-            </div>
+            </Link>
           );
         })}
       </nav>
