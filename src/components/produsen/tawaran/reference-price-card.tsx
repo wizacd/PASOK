@@ -1,85 +1,64 @@
-import { ArrowDown, ArrowUp, TrendingUp } from "lucide-react";
+"use client";
 
-type ReferencePrice = {
-  commodity: string;
-  updatedLabel: string;
-  price: string;
-  trend: {
-    direction: "up" | "down";
-    value: string;
-  };
+import { useEffect, useState } from "react";
+import { TrendingUp } from "lucide-react";
+
+type Rekomendasi = {
+  nama_komoditas: string;
+  harga_rekomendasi: number | null;
+  metode: string;
 };
 
-const REFERENCE_PRICES: ReferencePrice[] = [
-  {
-    commodity: "Jagung Pipil Kering",
-    updatedLabel: "Update: 2 jam yang lalu",
-    price: "Rp 8.250",
-    trend: { direction: "up", value: "2.4%" },
-  },
-  {
-    commodity: "Ikan Tongkol",
-    updatedLabel: "Update: 1 jam yang lalu",
-    price: "Rp 24.000",
-    trend: { direction: "down", value: "0.5%" },
-  },
-];
+function formatRupiah(value: number) {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
 
-export function ReferencePriceCard() {
+export function ReferencePriceCard({ komoditasRef }: { komoditasRef: string }) {
+  const [data, setData] = useState<Rekomendasi | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!komoditasRef) {
+      setData(null);
+      return;
+    }
+    setIsLoading(true);
+    fetch(`/api/harga/rekomendasi?komoditas_ref=${encodeURIComponent(komoditasRef)}`)
+      .then((res) => res.json())
+      .then((result) => setData(result.error ? null : result))
+      .finally(() => setIsLoading(false));
+  }, [komoditasRef]);
+
   return (
     <div className="w-full overflow-hidden rounded-sm border border-border-soft bg-white">
       <div className="flex items-center gap-2 border-b border-border-soft bg-chip px-4 py-4">
         <TrendingUp className="size-[15px] text-ink" strokeWidth={2} />
         <span className="text-xs font-semibold uppercase tracking-[0.6px] text-ink">
-          Harga Referensi Hari Ini
+          Rekomendasi Harga AI
         </span>
       </div>
 
-      <div className="flex flex-col gap-4 p-6">
-        {REFERENCE_PRICES.map((item, index) => {
-          const TrendIcon = item.trend.direction === "up" ? ArrowUp : ArrowDown;
-          const trendClassName =
-            item.trend.direction === "up" ? "text-brand" : "text-danger";
-          const priceClassName =
-            item.trend.direction === "up" ? "text-brand" : "text-ink";
-          return (
-            <div
-              key={item.commodity}
-              className={`flex items-center justify-between pb-3 ${
-                index < REFERENCE_PRICES.length - 1
-                  ? "border-b border-chip"
-                  : ""
-              }`}
-            >
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-ink">
-                  {item.commodity}
-                </span>
-                <span className="text-[10px] text-body">
-                  {item.updatedLabel}
-                </span>
-              </div>
-              <div className="flex flex-col items-end">
-                <span className={`text-base font-bold ${priceClassName}`}>
-                  {item.price}
-                </span>
-                <span
-                  className={`flex items-center gap-1 text-[10px] ${trendClassName}`}
-                >
-                  <TrendIcon className="size-2" strokeWidth={2.5} />
-                  {item.trend.value}
-                </span>
-              </div>
-            </div>
-          );
-        })}
-
-        <button
-          type="button"
-          className="py-1 text-xs font-semibold uppercase tracking-[0.6px] text-brand-deep"
-        >
-          Lihat Semua Tren Harga
-        </button>
+      <div className="flex flex-col gap-2 p-6">
+        {!komoditasRef ? (
+          <p className="text-sm text-body">Pilih komoditas dulu untuk lihat rekomendasi harga.</p>
+        ) : isLoading ? (
+          <p className="text-sm text-body">Memuat rekomendasi...</p>
+        ) : !data || data.harga_rekomendasi === null ? (
+          <p className="text-sm text-body">Belum ada data harga untuk komoditas ini.</p>
+        ) : (
+          <div className="flex flex-col gap-1">
+            <span className="text-sm font-medium text-ink">{data.nama_komoditas}</span>
+            <span className="text-2xl font-bold text-brand">
+              {formatRupiah(data.harga_rekomendasi)}
+              <span className="text-sm font-normal text-muted"> /kg</span>
+            </span>
+            <span className="pt-1 text-[11px] text-body">{data.metode}</span>
+          </div>
+        )}
       </div>
     </div>
   );

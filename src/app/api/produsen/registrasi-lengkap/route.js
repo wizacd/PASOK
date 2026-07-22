@@ -84,7 +84,7 @@ export async function POST(request) {
   // --- 2. Insert anggota_koperasi (koperasi_ref dikosongkan, di-assign lewat Supply Matching) ---
   const { data: anggota, error: errAnggota } = await supabase
     .from('anggota_koperasi')
-    .insert({ nama, kode_wilayah })
+    .insert({ nama, kode_wilayah, user_id: userId })
     .select()
     .single()
 

@@ -35,3 +35,8 @@ export function getRole(user) {
 export function getDashboardPath(role) {
   return DASHBOARD_PATHS[role] ?? '/login'
 }
+
+export async function getAccessToken() {
+  const { data } = await supabase.auth.getSession()
+  return data.session?.access_token ?? null
+}

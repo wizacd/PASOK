@@ -1,16 +1,20 @@
-const STATS = [
-  { value: 12, label: "Menunggu", className: "bg-chip border-border-soft text-warning" },
-  { value: 45, label: "Diterima", className: "bg-forest/5 border-forest/20 text-forest" },
-  { value: 3, label: "Ditolak", className: "bg-danger/5 border-danger/20 text-danger" },
-];
+export type OfferSummaryWidgetProps = {
+  menunggu: number;
+  diterima: number;
+};
 
-export function OfferSummaryWidget() {
+export function OfferSummaryWidget({ menunggu, diterima }: OfferSummaryWidgetProps) {
+  const stats = [
+    { value: menunggu, label: "Menunggu", className: "bg-chip border-border-soft text-warning" },
+    { value: diterima, label: "Diterima", className: "bg-forest/5 border-forest/20 text-forest" },
+  ];
+
   return (
     <div className="flex flex-col gap-6 rounded-sm border border-border-soft bg-white p-6">
       <h3 className="text-xl font-semibold text-ink">Ringkasan Penawaran</h3>
 
       <div className="flex justify-center gap-2">
-        {STATS.map((stat) => (
+        {stats.map((stat) => (
           <div
             key={stat.label}
             className={`flex flex-1 flex-col items-center rounded-sm border p-3 ${stat.className}`}
@@ -22,13 +26,6 @@ export function OfferSummaryWidget() {
           </div>
         ))}
       </div>
-
-      <button
-        type="button"
-        className="rounded-xs border border-forest/20 py-2 text-sm font-bold text-forest"
-      >
-        Lihat Detail Laporan
-      </button>
     </div>
   );
 }

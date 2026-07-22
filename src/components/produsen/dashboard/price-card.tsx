@@ -7,7 +7,7 @@ export type PriceCardProps = {
   price: string;
   metaLabel: string;
   metaValue: string;
-  trend: {
+  trend?: {
     direction: "up" | "down";
     value: string;
   };
@@ -22,9 +22,9 @@ export function PriceCard({
   metaValue,
   trend,
 }: PriceCardProps) {
-  const TrendIcon = trend.direction === "up" ? TrendingUp : TrendingDown;
+  const TrendIcon = trend?.direction === "up" ? TrendingUp : TrendingDown;
   const trendClassName =
-    trend.direction === "up"
+    trend?.direction === "up"
       ? "bg-success/10 text-success"
       : "bg-danger/10 text-danger";
 
@@ -32,12 +32,14 @@ export function PriceCard({
     <div className="flex flex-col gap-2 rounded-sm border border-border-soft bg-white px-6 py-6">
       <div className="flex items-start justify-between">
         <Icon className={`size-9 ${iconClassName}`} strokeWidth={1.5} />
-        <span
-          className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${trendClassName}`}
-        >
-          <TrendIcon className="size-2.5" strokeWidth={2.5} />
-          {trend.value}
-        </span>
+        {trend ? (
+          <span
+            className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${trendClassName}`}
+          >
+            <TrendIcon className="size-2.5" strokeWidth={2.5} />
+            {trend.value}
+          </span>
+        ) : null}
       </div>
 
       <div className="flex flex-col pt-2">
