@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Bell, Building2, CreditCard, ShieldCheck } from "lucide-react";
+import { Bell, Building2, CreditCard, History, Laptop, ShieldCheck } from "lucide-react";
 import { getAccessToken } from "@/lib/auth";
 import { ToggleRow } from "@/components/produsen/pengaturan/toggle-row";
+import { ChangePasswordForm } from "@/components/produsen/pengaturan/change-password-form";
 
 type Tab = "profil" | "notifikasi" | "keamanan" | "rekening";
 
@@ -335,6 +336,51 @@ export default function PengaturanPage() {
                     checked={profil.preferensi_notifikasi.keamanan_akun}
                     onChange={(value) => updatePreferensi("keamanan_akun", value)}
                   />
+                </div>
+              </div>
+            </div>
+          ) : activeTab === "keamanan" ? (
+            <div className="flex flex-col gap-8">
+              <div className="border-b border-border-soft pb-4">
+                <h2 className="text-base text-ink">Keamanan Akun</h2>
+              </div>
+
+              <ChangePasswordForm email={profil.email} />
+
+              <div className="flex items-center justify-between border-t border-border-soft pt-6">
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-base text-ink">
+                    Verifikasi Dua Faktor (2FA)
+                  </span>
+                  <span className="text-sm text-muted">
+                    Tambahkan lapisan keamanan ekstra pada akun Anda dengan kode
+                    verifikasi. Segera hadir.
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  disabled
+                  aria-disabled
+                  className="relative h-6 w-11 shrink-0 cursor-not-allowed rounded-full bg-border-soft opacity-60"
+                >
+                  <span className="absolute top-0.5 left-0.5 size-5 rounded-full bg-white" />
+                </button>
+              </div>
+
+              <div className="flex flex-col gap-4 border-t border-border-soft pt-6">
+                <h3 className="flex items-center gap-2 text-base text-ink">
+                  <History className="size-[18px]" strokeWidth={2} />
+                  Riwayat Login
+                </h3>
+                <div className="flex flex-col items-center gap-2 rounded-xs bg-canvas py-10 text-center">
+                  <Laptop className="size-6 text-muted" strokeWidth={1.5} />
+                  <p className="text-sm text-body">
+                    Riwayat perangkat & lokasi login belum tersedia.
+                  </p>
+                  <p className="max-w-xs text-xs text-muted">
+                    Fitur ini butuh sistem pencatatan sesi login yang belum
+                    dibangun.
+                  </p>
                 </div>
               </div>
             </div>

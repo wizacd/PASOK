@@ -40,3 +40,20 @@ export async function getAccessToken() {
   const { data } = await supabase.auth.getSession()
   return data.session?.access_token ?? null
 }
+
+export async function changePassword(email, currentPassword, newPassword) {
+  const { error: verifyError } = await supabase.auth.signInWithPassword({
+    email,
+    password: currentPassword,
+  })
+
+  if (verifyError) {
+    throw new Error('Kata sandi saat ini salah.')
+  }
+
+  const { error: updateError } = await supabase.auth.updateUser({ password: newPassword })
+
+  if (updateError) {
+    throw new Error(updateError.message)
+  }
+}
