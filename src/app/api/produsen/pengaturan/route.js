@@ -1,5 +1,13 @@
 import { getAnggotaFromRequest } from '@/lib/server-auth'
 
+const DEFAULT_PREFERENSI_NOTIFIKASI = {
+  harga_komoditas: true,
+  status_penawaran: true,
+  informasi_koperasi: false,
+  laporan_mingguan: true,
+  keamanan_akun: true,
+}
+
 export async function GET(request) {
   const result = await getAnggotaFromRequest(request)
   if (result.error) {
@@ -18,7 +26,7 @@ export async function GET(request) {
 
   const { data: fullAnggota } = await supabase
     .from('anggota_koperasi')
-    .select('nama, pekerjaan, telepon')
+    .select('nama, pekerjaan, telepon, preferensi_notifikasi')
     .eq('anggota_ref', anggota.anggota_ref)
     .single()
 
@@ -28,6 +36,7 @@ export async function GET(request) {
     telepon: fullAnggota?.telepon ?? '',
     alamat: lokasi?.alamat ?? '',
     email: authData?.user?.email ?? '',
+    preferensi_notifikasi: fullAnggota?.preferensi_notifikasi ?? DEFAULT_PREFERENSI_NOTIFIKASI,
   })
 }
 
@@ -39,6 +48,20 @@ export async function PATCH(request) {
 
   const { anggota, supabase } = result
   const body = await request.json()
+
+  if (body.preferensi_notifikasi) {
+    const { error } = await supabase
+      .from('anggota_koperasi')
+      .update({ preferensi_notifikasi: body.preferensi_notifikasi })
+      .eq('anggota_ref', anggota.anggota_ref)
+
+    if (error) {
+      return Response.json({ error: error.message }, { status: 400 })
+    }
+
+    return Response.json({ success: true })
+  }
+
   const { nama, pekerjaan, telepon } = body
 
   if (!nama) {

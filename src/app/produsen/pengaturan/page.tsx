@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Bell, Building2, CreditCard, ShieldCheck } from "lucide-react";
 import { getAccessToken } from "@/lib/auth";
+import { ToggleRow } from "@/components/produsen/pengaturan/toggle-row";
 
 type Tab = "profil" | "notifikasi" | "keamanan" | "rekening";
 
@@ -15,12 +16,21 @@ const TABS: { id: Tab; label: string; icon: typeof Building2 }[] = [
 
 const TIPE_BISNIS_OPTIONS = ["Petani", "Nelayan", "Lainnya"];
 
+type PreferensiNotifikasi = {
+  harga_komoditas: boolean;
+  status_penawaran: boolean;
+  informasi_koperasi: boolean;
+  laporan_mingguan: boolean;
+  keamanan_akun: boolean;
+};
+
 type Profil = {
   nama: string;
   pekerjaan: string;
   telepon: string;
   alamat: string;
   email: string;
+  preferensi_notifikasi: PreferensiNotifikasi;
 };
 
 export default function PengaturanPage() {
@@ -58,7 +68,7 @@ export default function PengaturanPage() {
     load();
   }, []);
 
-  async function handleSave() {
+  async function handleSaveProfil() {
     if (!profil) return;
     setError("");
     setSavedMessage("");
@@ -89,6 +99,43 @@ export default function PengaturanPage() {
     setIsSaving(false);
   }
 
+  async function handleSaveNotifikasi() {
+    if (!profil) return;
+    setError("");
+    setSavedMessage("");
+    setIsSaving(true);
+
+    const token = await getAccessToken();
+    const response = await fetch("/api/produsen/pengaturan", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        preferensi_notifikasi: profil.preferensi_notifikasi,
+      }),
+    });
+    const result = await response.json();
+
+    if (!response.ok) {
+      setError(result.error ?? "Gagal menyimpan perubahan.");
+      setIsSaving(false);
+      return;
+    }
+
+    setSavedMessage("Preferensi notifikasi berhasil disimpan.");
+    setIsSaving(false);
+  }
+
+  function updatePreferensi(key: keyof PreferensiNotifikasi, value: boolean) {
+    if (!profil) return;
+    setProfil({
+      ...profil,
+      preferensi_notifikasi: { ...profil.preferensi_notifikasi, [key]: value },
+    });
+  }
+
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-1">
@@ -107,7 +154,10 @@ export default function PengaturanPage() {
               <button
                 key={tab.id}
                 type="button"
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  setSavedMessage("");
+                }}
                 className={`flex items-center gap-3 rounded-xs px-4 py-3 text-left text-sm font-medium ${
                   isActive
                     ? "border-l-4 border-brand bg-chip text-info-deep"
@@ -128,22 +178,13 @@ export default function PengaturanPage() {
             <p className="text-sm text-danger" role="alert">
               {error}
             </p>
-          ) : activeTab !== "profil" ? (
-            <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
-              <p className="text-base font-medium text-ink">
-                {TABS.find((t) => t.id === activeTab)?.label} belum tersedia
-              </p>
-              <p className="text-sm text-body">
-                Fitur ini masih dalam pengembangan.
-              </p>
-            </div>
-          ) : profil ? (
+          ) : !profil ? null : activeTab === "profil" ? (
             <div className="flex flex-col gap-6">
               <div className="flex items-center justify-between border-b border-border-soft pb-4">
                 <h2 className="text-base text-ink">Profil Bisnis</h2>
                 <button
                   type="button"
-                  onClick={handleSave}
+                  onClick={handleSaveProfil}
                   disabled={isSaving}
                   className="rounded-xs bg-brand px-4 py-2 text-sm text-white disabled:opacity-60"
                 >
@@ -233,7 +274,80 @@ export default function PengaturanPage() {
                 </div>
               </div>
             </div>
-          ) : null}
+          ) : activeTab === "notifikasi" ? (
+            <div className="flex flex-col gap-8">
+              <div className="flex items-center justify-between border-b border-border-soft pb-4">
+                <h2 className="text-base text-ink">Pengaturan Notifikasi</h2>
+                <button
+                  type="button"
+                  onClick={handleSaveNotifikasi}
+                  disabled={isSaving}
+                  className="rounded-xs bg-brand px-4 py-2 text-sm text-white disabled:opacity-60"
+                >
+                  {isSaving ? "Menyimpan..." : "Simpan Perubahan"}
+                </button>
+              </div>
+
+              {savedMessage ? (
+                <p className="text-sm text-success">{savedMessage}</p>
+              ) : null}
+
+              <div className="flex flex-col gap-4">
+                <h3 className="text-sm font-semibold uppercase tracking-[0.8px] text-body">
+                  Notifikasi Aplikasi
+                </h3>
+                <div className="flex flex-col gap-4">
+                  <ToggleRow
+                    title="Harga Komoditas"
+                    description="Update harga pasar secara real-time."
+                    checked={profil.preferensi_notifikasi.harga_komoditas}
+                    onChange={(value) => updatePreferensi("harga_komoditas", value)}
+                  />
+                  <ToggleRow
+                    title="Status Penawaran"
+                    description="Notifikasi saat penawaran Anda diterima atau dinegosiasi."
+                    checked={profil.preferensi_notifikasi.status_penawaran}
+                    onChange={(value) => updatePreferensi("status_penawaran", value)}
+                  />
+                  <ToggleRow
+                    title="Informasi Koperasi"
+                    description="Pengumuman penting dari pengurus koperasi."
+                    checked={profil.preferensi_notifikasi.informasi_koperasi}
+                    onChange={(value) => updatePreferensi("informasi_koperasi", value)}
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-4">
+                <h3 className="text-sm font-semibold uppercase tracking-[0.8px] text-body">
+                  Notifikasi Email
+                </h3>
+                <div className="flex flex-col gap-4">
+                  <ToggleRow
+                    title="Laporan Mingguan"
+                    description="Ringkasan transaksi dan performa bisnis mingguan."
+                    checked={profil.preferensi_notifikasi.laporan_mingguan}
+                    onChange={(value) => updatePreferensi("laporan_mingguan", value)}
+                  />
+                  <ToggleRow
+                    title="Keamanan Akun"
+                    description="Peringatan login baru atau perubahan kata sandi."
+                    checked={profil.preferensi_notifikasi.keamanan_akun}
+                    onChange={(value) => updatePreferensi("keamanan_akun", value)}
+                  />
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
+              <p className="text-base font-medium text-ink">
+                {TABS.find((t) => t.id === activeTab)?.label} belum tersedia
+              </p>
+              <p className="text-sm text-body">
+                Fitur ini masih dalam pengembangan.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
