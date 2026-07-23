@@ -17,6 +17,16 @@ const TABS: { id: Tab; label: string; icon: typeof Building2 }[] = [
 
 const TIPE_BISNIS_OPTIONS = ["Petani", "Nelayan", "Lainnya"];
 
+const BANK_OPTIONS = [
+  "Bank Central Asia (BCA)",
+  "Bank Rakyat Indonesia (BRI)",
+  "Bank Negara Indonesia (BNI)",
+  "Bank Mandiri",
+  "Bank Syariah Indonesia (BSI)",
+  "CIMB Niaga",
+  "Lainnya",
+];
+
 type PreferensiNotifikasi = {
   harga_komoditas: boolean;
   status_penawaran: boolean;
@@ -32,6 +42,8 @@ type Profil = {
   alamat: string;
   email: string;
   preferensi_notifikasi: PreferensiNotifikasi;
+  bank_name: string;
+  nomor_rekening: string;
 };
 
 export default function PengaturanPage() {
@@ -126,6 +138,36 @@ export default function PengaturanPage() {
     }
 
     setSavedMessage("Preferensi notifikasi berhasil disimpan.");
+    setIsSaving(false);
+  }
+
+  async function handleSaveRekening() {
+    if (!profil) return;
+    setError("");
+    setSavedMessage("");
+    setIsSaving(true);
+
+    const token = await getAccessToken();
+    const response = await fetch("/api/produsen/pengaturan", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        bank_name: profil.bank_name,
+        nomor_rekening: profil.nomor_rekening,
+      }),
+    });
+    const result = await response.json();
+
+    if (!response.ok) {
+      setError(result.error ?? "Gagal menyimpan perubahan.");
+      setIsSaving(false);
+      return;
+    }
+
+    setSavedMessage("Data rekening berhasil disimpan.");
     setIsSaving(false);
   }
 
@@ -383,6 +425,86 @@ export default function PengaturanPage() {
                   </p>
                 </div>
               </div>
+            </div>
+          ) : activeTab === "rekening" ? (
+            <div className="flex flex-col gap-8">
+              <div className="flex items-center justify-between border-b border-border-soft pb-4">
+                <h2 className="text-base text-ink">Rekening Bank</h2>
+                <button
+                  type="button"
+                  onClick={handleSaveRekening}
+                  disabled={isSaving}
+                  className="rounded-xs bg-brand px-4 py-2 text-sm text-white disabled:opacity-60"
+                >
+                  {isSaving ? "Menyimpan..." : "Simpan Perubahan"}
+                </button>
+              </div>
+
+              {savedMessage ? (
+                <p className="text-sm text-success">{savedMessage}</p>
+              ) : null}
+
+              <div className="flex flex-col gap-4">
+                <h3 className="text-sm font-semibold uppercase tracking-[0.8px] text-info">
+                  Rekening Utama
+                </h3>
+
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="flex flex-col gap-2">
+                    <label className="text-xs font-semibold uppercase tracking-[0.6px] text-body">
+                      Nama Bank
+                    </label>
+                    <select
+                      value={profil.bank_name}
+                      onChange={(event) =>
+                        setProfil({ ...profil, bank_name: event.target.value })
+                      }
+                      className="rounded-xs border border-border-soft bg-canvas p-3 text-sm text-ink focus:border-brand focus:outline-none"
+                    >
+                      <option value="">Pilih bank</option>
+                      {BANK_OPTIONS.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <label className="text-xs font-semibold uppercase tracking-[0.6px] text-body">
+                      Nomor Rekening
+                    </label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="Contoh: 8892001234"
+                      value={profil.nomor_rekening}
+                      onChange={(event) =>
+                        setProfil({ ...profil, nomor_rekening: event.target.value })
+                      }
+                      className="rounded-xs border border-border-soft bg-canvas p-3 text-sm text-ink placeholder:text-body/70 focus:border-brand focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="col-span-2 flex flex-col gap-2">
+                    <label className="text-xs font-semibold uppercase tracking-[0.6px] text-body">
+                      Nama Pemilik Rekening
+                    </label>
+                    <div className="rounded-xs border border-border-soft bg-chip p-3 text-sm font-semibold text-ink">
+                      {profil.nama || "-"}
+                    </div>
+                    <p className="text-[11px] text-muted">
+                      Mengikuti Nama Bisnis di tab Profil Bisnis. Pastikan sama
+                      dengan nama di buku rekening.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <p className="border-t border-border-soft pt-6 text-xs italic text-muted">
+                Data rekening ini akan digunakan sebagai tujuan pencairan dana.
+                Pastikan data yang Anda masukkan sudah benar.
+              </p>
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">

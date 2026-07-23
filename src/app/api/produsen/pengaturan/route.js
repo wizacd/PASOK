@@ -26,7 +26,7 @@ export async function GET(request) {
 
   const { data: fullAnggota } = await supabase
     .from('anggota_koperasi')
-    .select('nama, pekerjaan, telepon, preferensi_notifikasi')
+    .select('nama, pekerjaan, telepon, preferensi_notifikasi, bank_name, nomor_rekening')
     .eq('anggota_ref', anggota.anggota_ref)
     .single()
 
@@ -37,6 +37,8 @@ export async function GET(request) {
     alamat: lokasi?.alamat ?? '',
     email: authData?.user?.email ?? '',
     preferensi_notifikasi: fullAnggota?.preferensi_notifikasi ?? DEFAULT_PREFERENSI_NOTIFIKASI,
+    bank_name: fullAnggota?.bank_name ?? '',
+    nomor_rekening: fullAnggota?.nomor_rekening ?? '',
   })
 }
 
@@ -62,6 +64,22 @@ export async function PATCH(request) {
     return Response.json({ success: true })
   }
 
+  if ('bank_name' in body || 'nomor_rekening' in body) {
+    const { error } = await supabase
+      .from('anggota_koperasi')
+      .update({
+        bank_name: body.bank_name || null,
+        nomor_rekening: body.nomor_rekening || null,
+      })
+      .eq('anggota_ref', anggota.anggota_ref)
+
+    if (error) {
+      return Response.json({ error: error.message }, { status: 400 })
+    }
+
+    return Response.json({ success: true })
+  }
+
   const { nama, pekerjaan, telepon } = body
 
   if (!nama) {
@@ -70,7 +88,7 @@ export async function PATCH(request) {
 
   const { error } = await supabase
     .from('anggota_koperasi')
-    .update({ nama, pekerjaan: pekerjaan ?? null, telepon: telepon ?? null })
+    .update({ nama, pekerjaan: pekerjaan || null, telepon: telepon || null })
     .eq('anggota_ref', anggota.anggota_ref)
 
   if (error) {
