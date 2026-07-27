@@ -17,6 +17,8 @@ type RegistrationWizardState = {
   nibFile: File | null;
   wilayah: WilayahSelection;
   koperasiRef: string | null;
+  lat: number | null;
+  lng: number | null;
 };
 
 type RegistrationWizardContextValue = RegistrationWizardState & {
@@ -36,6 +38,8 @@ const initialState: RegistrationWizardState = {
   nibFile: null,
   wilayah: null,
   koperasiRef: null,
+  lat: null,
+  lng: null,
 };
 
 const RegistrationWizardContext =

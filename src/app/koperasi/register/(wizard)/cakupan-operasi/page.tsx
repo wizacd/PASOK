@@ -22,6 +22,11 @@ export default function CakupanOperasiPage() {
       return;
     }
 
+    if (wizard.lat === null || wizard.lng === null) {
+      setError("Tentukan koordinat pusat operasi dengan tombol \"Gunakan Lokasi Saat Ini\".");
+      return;
+    }
+
     if (
       !wizard.namaKoperasi ||
       !wizard.email ||
@@ -47,6 +52,8 @@ export default function CakupanOperasiPage() {
     formData.set("nik_pengurus", wizard.nikPengurus);
     formData.set("nikop", wizard.nikop);
     formData.set("kode_wilayah", wizard.wilayah.kodeWilayah);
+    formData.set("lat", String(wizard.lat));
+    formData.set("lng", String(wizard.lng));
     formData.set("akte", wizard.akteFile);
     formData.set("nib", wizard.nibFile);
 

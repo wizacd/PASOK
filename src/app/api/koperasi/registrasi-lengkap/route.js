@@ -24,12 +24,14 @@ export async function POST(request) {
   const nikPengurus = formData.get('nik_pengurus')
   const nikop = formData.get('nikop')
   const kodeWilayah = formData.get('kode_wilayah')
+  const lat = formData.get('lat')
+  const lng = formData.get('lng')
   const akteFile = formData.get('akte')
   const nibFile = formData.get('nib')
 
   if (
     !email || !password || !namaKoperasi || !nikPengurus ||
-    !nikop || !kodeWilayah || !akteFile || !nibFile
+    !nikop || !kodeWilayah || !lat || !lng || !akteFile || !nibFile
   ) {
     return Response.json({ error: 'Semua data dan dokumen wajib diisi' }, { status: 400 })
   }
@@ -83,6 +85,7 @@ export async function POST(request) {
       nama_koperasi: namaKoperasi,
       nik_pengurus: nikPengurus,
       nikop,
+      koordinat_dibulatkan: `${lat}, ${lng}`,
     })
 
   if (errProfil) {
