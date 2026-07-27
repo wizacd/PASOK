@@ -1,7 +1,6 @@
 const LEGEND_ITEMS = [
   { label: "Pertanian", color: "#008aa9" },
   { label: "Kelautan", color: "#0369a1" },
-  { label: "Processing Hub", color: "#f59e0b" },
 ];
 
 export function MapLegend() {

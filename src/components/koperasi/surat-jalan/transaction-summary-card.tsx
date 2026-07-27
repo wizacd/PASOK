@@ -1,13 +1,26 @@
 import { FileText } from "lucide-react";
 
-const SUMMARY_FIELDS = [
-  { label: "ID Transaksi", value: "TRX-99210" },
-  { label: "Nama Produser", value: "Bambang S." },
-  { label: "Komoditas", value: "Kopi Arabika" },
-  { label: "Volume", value: "450 kg" },
-];
+export type TransaksiDiterima = {
+  matching_id: string;
+  produsen: string;
+  alamat_produsen: string | null;
+  komoditas: string;
+  volume_kg: number;
+  harga_per_kg: number;
+};
 
-export function TransactionSummaryCard() {
+export function TransactionSummaryCard({
+  transaksi,
+}: {
+  transaksi: TransaksiDiterima;
+}) {
+  const fields = [
+    { label: "ID Transaksi", value: transaksi.matching_id.slice(0, 8).toUpperCase() },
+    { label: "Nama Produsen", value: transaksi.produsen },
+    { label: "Komoditas", value: transaksi.komoditas },
+    { label: "Volume", value: `${transaksi.volume_kg.toLocaleString("id-ID")} kg` },
+  ];
+
   return (
     <div className="flex w-full flex-col gap-4 rounded-xs border border-border-soft bg-white p-6">
       <div className="flex items-center gap-2">
@@ -15,7 +28,7 @@ export function TransactionSummaryCard() {
         <h3 className="text-xl font-semibold text-ink">Ringkasan Transaksi</h3>
       </div>
       <div className="flex gap-6 rounded-xs bg-canvas p-4">
-        {SUMMARY_FIELDS.map((field) => (
+        {fields.map((field) => (
           <div key={field.label} className="flex flex-col gap-1">
             <span className="text-[11px] font-medium text-muted">
               {field.label}

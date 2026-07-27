@@ -1,88 +1,79 @@
-import { AlertTriangle, ShieldCheck, Ship } from "lucide-react";
+import Link from "next/link";
+import { Clock } from "lucide-react";
 
-const NOTIFICATIONS = [
-  {
-    icon: AlertTriangle,
-    iconBgClassName: "bg-warning/10",
-    iconClassName: "text-warning",
-    title: "Penawaran Mendesak: Jagung",
-    time: "2m lalu",
-    description: "Volume 5 Ton - Kedaluwarsa dalam 3 jam.",
-  },
-  {
-    icon: ShieldCheck,
-    iconBgClassName: "bg-info/10",
-    iconClassName: "text-info",
-    title: "Verifikasi Akun Baru",
-    time: "1j lalu",
-    description: "3 Produsen dari wilayah Bitung menunggu verifikasi identitas.",
-  },
-  {
-    icon: Ship,
-    iconBgClassName: "bg-success/10",
-    iconClassName: "text-success",
-    title: "Jadwal Kapal Update",
-    time: "4j lalu",
-    description: "KM Nusantara 02 estimasi tiba 08:00 WIB besok.",
-  },
-];
+export type PenawaranMendekatiPanen = {
+  id: string;
+  produsen: string;
+  komoditas: string;
+  volume_kg: number;
+  estimasi_tanggal_panen: string;
+};
 
-export function PriorityNotificationsCard() {
+function hariLagi(tanggalPanen: string) {
+  const diffMs = new Date(tanggalPanen).getTime() - Date.now();
+  const diffHari = Math.round(diffMs / (1000 * 60 * 60 * 24));
+  if (diffHari <= 0) return "Siap panen";
+  return `${diffHari} hari lagi`;
+}
+
+export function PriorityNotificationsCard({
+  items,
+}: {
+  items: PenawaranMendekatiPanen[];
+}) {
   return (
     <div className="flex w-full flex-col overflow-hidden rounded-xs border border-border-soft bg-white">
       <div className="flex items-center justify-between border-b border-border-soft px-4 py-4">
         <h4 className="text-xs font-semibold uppercase tracking-[0.6px] text-ink">
-          Notifikasi Prioritas
+          Penawaran Mendekati Panen
         </h4>
-        <span className="rounded-full bg-danger px-2 py-0.5 text-[10px] font-bold text-white">
-          2 Baru
-        </span>
+        {items.length > 0 ? (
+          <span className="rounded-full bg-warning px-2 py-0.5 text-[10px] font-bold text-white">
+            {items.length}
+          </span>
+        ) : null}
       </div>
 
       <div className="flex flex-col">
-        {NOTIFICATIONS.map(
-          ({ icon: Icon, iconBgClassName, iconClassName, title, time, description }, index) => (
+        {items.length === 0 ? (
+          <p className="px-4 py-6 text-sm text-body">
+            Tidak ada penawaran yang perlu segera ditindaklanjuti.
+          </p>
+        ) : (
+          items.map((item, index) => (
             <div
-              key={title}
+              key={item.id}
               className={`flex gap-3 px-4 py-4 ${
                 index > 0 ? "border-t border-border-soft" : ""
               }`}
             >
-              <div
-                className={`flex size-9 shrink-0 items-center justify-center rounded-xs ${iconBgClassName}`}
-              >
-                <Icon className={`size-4 ${iconClassName}`} strokeWidth={2} />
+              <div className="flex size-9 shrink-0 items-center justify-center rounded-xs bg-warning/10">
+                <Clock className="size-4 text-warning" strokeWidth={2} />
               </div>
               <div className="flex flex-1 flex-col gap-1">
                 <div className="flex items-start justify-between gap-2">
                   <span className="text-xs font-semibold tracking-[0.6px] text-ink">
-                    {title}
+                    {item.komoditas} — {item.produsen}
                   </span>
                   <span className="shrink-0 text-[10px] text-body">
-                    {time}
+                    {hariLagi(item.estimasi_tanggal_panen)}
                   </span>
                 </div>
-                <p className="text-sm text-body">{description}</p>
-                {index === 0 ? (
-                  <button
-                    type="button"
-                    className="w-fit pt-1 text-[11px] font-semibold uppercase tracking-[0.6px] text-info"
-                  >
-                    Tindak Lanjuti
-                  </button>
-                ) : null}
+                <p className="text-sm text-body">
+                  Volume {item.volume_kg.toLocaleString("id-ID")} Kg
+                </p>
               </div>
             </div>
-          ),
+          ))
         )}
       </div>
 
-      <button
-        type="button"
+      <Link
+        href="/koperasi/supply-matching"
         className="border-t border-border-soft py-3 text-center text-sm text-body"
       >
-        Lihat Semua Aktivitas
-      </button>
+        Lihat di Supply Matching
+      </Link>
     </div>
   );
 }

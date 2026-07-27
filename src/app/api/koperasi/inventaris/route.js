@@ -13,48 +13,42 @@ export async function GET(request) {
     return Response.json({ error: 'koperasi_ref wajib diisi' }, { status: 400 })
   }
 
-  const { data, error } = await supabase
-    .from('matching')
-    .select(`
-      id, created_at,
-      penawaran (
-        id, estimasi_volume, harga_ditawarkan, estimasi_tanggal_panen,
-        anggota_koperasi ( nama ),
-        referensi_komoditas_desa ( nama_komoditas )
-      )
-    `)
+  const { data: lots, error: errLots } = await supabase
+    .from('barang_masuk_produk')
+    .select('barang_masuk_ref, nama_produk, jumlah_masuk, jumlah_tersedia, harga_beli, total_biaya, status, tanggal_masuk')
     .eq('koperasi_ref', koperasi_ref)
-    .eq('status', 'diterima')
+    .order('tanggal_masuk', { ascending: false })
+  if (errLots) return Response.json({ error: errLots.message }, { status: 400 })
 
-  if (error) return Response.json({ error: error.message }, { status: 400 })
+  const { data: stokProduk, error: errStok } = await supabase
+    .from('inventaris_produk')
+    .select('nama_produk, stok')
+    .eq('koperasi_ref', koperasi_ref)
+  if (errStok) return Response.json({ error: errStok.message }, { status: 400 })
 
-  const items = data
-    .filter((m) => m.penawaran)
-    .map((m) => ({
-      matching_id: m.id,
-      penawaran_id: m.penawaran.id,
-      komoditas: m.penawaran.referensi_komoditas_desa?.nama_komoditas ?? 'Tidak diketahui',
-      produsen: m.penawaran.anggota_koperasi?.nama ?? 'Produsen',
-      volume_kg: m.penawaran.estimasi_volume,
-      harga_per_kg: m.penawaran.harga_ditawarkan,
-      tanggal_panen: m.penawaran.estimasi_tanggal_panen,
-      diterima_pada: m.created_at,
-    }))
-    .sort((a, b) => new Date(b.diterima_pada).getTime() - new Date(a.diterima_pada).getTime())
+  const items = lots.map((l) => ({
+    barang_masuk_ref: l.barang_masuk_ref,
+    komoditas: l.nama_produk,
+    jumlah_masuk_kg: l.jumlah_masuk,
+    jumlah_tersedia_kg: l.jumlah_tersedia,
+    harga_beli_per_kg: l.harga_beli,
+    total_biaya: l.total_biaya,
+    status: l.status,
+    tanggal_masuk: l.tanggal_masuk,
+  }))
 
-  const totalVolumeKg = items.reduce((sum, i) => sum + (i.volume_kg ?? 0), 0)
-  const totalNilai = items.reduce((sum, i) => sum + (i.volume_kg ?? 0) * (i.harga_per_kg ?? 0), 0)
-  const jumlahProdusen = new Set(items.map((i) => i.produsen)).size
+  const totalVolumeKg = stokProduk.reduce((sum, p) => sum + (p.stok ?? 0), 0)
+  const totalNilai = lots.reduce(
+    (sum, l) => sum + (l.jumlah_tersedia ?? 0) * (l.harga_beli ?? 0),
+    0
+  )
+  const jumlahJenisProduk = stokProduk.length
 
-  const volumePerKomoditas = new Map()
-  for (const i of items) {
-    volumePerKomoditas.set(i.komoditas, (volumePerKomoditas.get(i.komoditas) ?? 0) + (i.volume_kg ?? 0))
-  }
-  const breakdownKomoditas = [...volumePerKomoditas.entries()]
-    .map(([nama, volume_kg]) => ({
-      nama,
-      volume_kg,
-      persen: totalVolumeKg > 0 ? Math.round((volume_kg / totalVolumeKg) * 100) : 0,
+  const breakdownKomoditas = stokProduk
+    .map((p) => ({
+      nama: p.nama_produk,
+      volume_kg: p.stok,
+      persen: totalVolumeKg > 0 ? Math.round((p.stok / totalVolumeKg) * 100) : 0,
     }))
     .sort((a, b) => b.volume_kg - a.volume_kg)
 
@@ -64,8 +58,8 @@ export async function GET(request) {
       ringkasan: {
         totalVolumeKg,
         totalNilai,
-        jumlahLot: items.length,
-        jumlahProdusen,
+        jumlahLot: lots.length,
+        jumlahJenisProduk,
         breakdownKomoditas,
       },
     },

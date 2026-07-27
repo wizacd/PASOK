@@ -22,8 +22,7 @@ export function QuickShortcutCard() {
         </div>
 
         <p className="text-sm text-white/70">
-          Pantau lokasi produsen dan armada logistik secara real-time di
-          seluruh wilayah.
+          Pantau sebaran lokasi produsen di seluruh wilayah kerja koperasi.
         </p>
 
         <span className="flex items-center gap-2 pt-2 text-xs font-semibold tracking-[0.6px] text-white">

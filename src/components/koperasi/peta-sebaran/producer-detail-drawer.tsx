@@ -8,6 +8,11 @@ const STATUS_STYLES: Record<ProducerPin["status"], string> = {
   "Segera Panen": "bg-warning/10 text-warning",
 };
 
+function waLink(telepon: string) {
+  const digits = telepon.replace(/[^0-9]/g, "").replace(/^0/, "62");
+  return `https://wa.me/${digits}`;
+}
+
 export function ProducerDetailDrawer({
   pin,
   onClose,
@@ -56,6 +61,16 @@ export function ProducerDetailDrawer({
                 {pin.komoditas}
               </span>
             </div>
+            {pin.jarak_km !== null ? (
+              <div className="flex items-center justify-between border-b border-chip-strong pb-3">
+                <span className="text-xs font-semibold tracking-[0.6px] text-body">
+                  Jarak dari Koperasi
+                </span>
+                <span className="text-sm font-semibold text-ink">
+                  {pin.jarak_km} km
+                </span>
+              </div>
+            ) : null}
             <div className="flex items-center gap-2 pb-3 text-sm text-body">
               <MapPin className="size-4 shrink-0" strokeWidth={2} />
               {pin.lokasi}
@@ -63,28 +78,30 @@ export function ProducerDetailDrawer({
           </div>
 
           <div className="mt-auto flex flex-col gap-3 border-t border-chip-strong bg-canvas px-6 pb-6 pt-6">
-            <div className="flex gap-3">
-              <button
-                type="button"
-                className="flex flex-1 items-center justify-center gap-2 rounded-xs bg-[#25d366] py-3 text-sm font-semibold text-white"
-              >
-                <MessageCircle className="size-5" strokeWidth={2} />
-                WhatsApp
-              </button>
-              <button
-                type="button"
-                className="flex flex-1 items-center justify-center gap-2 rounded-xs bg-info py-3 text-sm font-semibold text-white"
-              >
-                <Phone className="size-5" strokeWidth={2} />
-                Telepon
-              </button>
-            </div>
-            <button
-              type="button"
-              className="rounded-xs border border-chip-strong bg-white py-3 text-sm font-semibold text-ink"
-            >
-              Ajukan Penawaran
-            </button>
+            {pin.telepon ? (
+              <div className="flex gap-3">
+                <a
+                  href={waLink(pin.telepon)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex flex-1 items-center justify-center gap-2 rounded-xs bg-[#25d366] py-3 text-sm font-semibold text-white"
+                >
+                  <MessageCircle className="size-5" strokeWidth={2} />
+                  WhatsApp
+                </a>
+                <a
+                  href={`tel:${pin.telepon}`}
+                  className="flex flex-1 items-center justify-center gap-2 rounded-xs bg-info py-3 text-sm font-semibold text-white"
+                >
+                  <Phone className="size-5" strokeWidth={2} />
+                  Telepon
+                </a>
+              </div>
+            ) : (
+              <p className="text-center text-xs text-body">
+                Nomor kontak produsen belum terdaftar.
+              </p>
+            )}
           </div>
         </div>
       ) : null}

@@ -111,7 +111,7 @@ export function WaybillPreview({ data }: { data: WaybillData }) {
             <QrCode className="size-16 text-ink" strokeWidth={1} />
           </div>
           <p className="max-w-40 text-center text-[9px] italic leading-[13.5px] text-muted">
-            Scan untuk verifikasi digital via AgriMarine Chain
+            Nomor dokumen: {data.nomorDokumen}
           </p>
         </div>
 

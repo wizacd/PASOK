@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Archive, Package, Users, Wallet } from "lucide-react";
+import { Archive, Boxes, Package, Wallet } from "lucide-react";
 import { RequireAuth } from "@/components/auth/require-auth";
 import { DashboardSidebar } from "@/components/koperasi/dashboard/dashboard-sidebar";
 import { DashboardTopBar } from "@/components/koperasi/dashboard/dashboard-top-bar";
@@ -20,7 +20,7 @@ type Ringkasan = {
   totalVolumeKg: number;
   totalNilai: number;
   jumlahLot: number;
-  jumlahProdusen: number;
+  jumlahJenisProduk: number;
   breakdownKomoditas: KomoditasBreakdown[];
 };
 
@@ -90,7 +90,7 @@ export default function InventarisPage() {
                 Manajemen Inventaris &amp; Stok
               </h1>
               <p className="text-base text-body">
-                Stok komoditas yang sudah diterima dan dikelola koperasi.
+                Stok komoditas yang sudah ditimbang dan diterima secara fisik oleh koperasi.
               </p>
             </div>
 
@@ -128,15 +128,15 @@ export default function InventarisPage() {
                     icon={Archive}
                     iconBgClassName="bg-warning/5"
                     iconClassName="text-warning"
-                    label="Jumlah Lot Diterima"
+                    label="Jumlah Lot Masuk"
                     value={loading ? "..." : `${ringkasan?.jumlahLot ?? 0}`}
                   />
                   <MetricCard
-                    icon={Users}
+                    icon={Boxes}
                     iconBgClassName="bg-body/5"
                     iconClassName="text-body"
-                    label="Produsen Terlibat"
-                    value={loading ? "..." : `${ringkasan?.jumlahProdusen ?? 0}`}
+                    label="Jenis Produk"
+                    value={loading ? "..." : `${ringkasan?.jumlahJenisProduk ?? 0}`}
                   />
                 </div>
 

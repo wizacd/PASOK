@@ -1,7 +1,7 @@
 "use client";
 
 import { MapContainer, Marker, TileLayer, useMap } from "react-leaflet";
-import { DivIcon } from "leaflet";
+import { DivIcon, latLngBounds } from "leaflet";
 import { useEffect } from "react";
 import type {
   ProducerCategory,
@@ -11,7 +11,6 @@ import type {
 const CATEGORY_COLOR: Record<ProducerCategory, string> = {
   pertanian: "#008aa9",
   kelautan: "#0369a1",
-  hub: "#f59e0b",
 };
 
 function pinIcon(kategori: ProducerCategory) {
@@ -35,6 +34,18 @@ function FlyToSelection({ pin }: { pin: ProducerPin | null }) {
   return null;
 }
 
+function FitToPins({ pins }: { pins: ProducerPin[] }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (pins.length === 0) return;
+    const bounds = latLngBounds(pins.map((pin) => [pin.lat, pin.lng]));
+    map.fitBounds(bounds, { padding: [48, 48], maxZoom: 12 });
+  }, [pins, map]);
+
+  return null;
+}
+
 export function DistributionMap({
   pins,
   selectedPin,
@@ -46,8 +57,8 @@ export function DistributionMap({
 }) {
   return (
     <MapContainer
-      center={[1.2, 124.5]}
-      zoom={9}
+      center={[-2.5, 118]}
+      zoom={5}
       scrollWheelZoom
       className="size-full"
       zoomControl={false}
@@ -56,6 +67,7 @@ export function DistributionMap({
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
+      <FitToPins pins={pins} />
       <FlyToSelection pin={selectedPin} />
       {pins.map((pin) => (
         <Marker

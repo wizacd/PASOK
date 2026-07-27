@@ -3,14 +3,6 @@
 import { useState } from "react";
 import { Sprout, Waves } from "lucide-react";
 
-const KOMODITAS_OPTIONS = [
-  "Padi",
-  "Jagung",
-  "Ikan Tuna",
-  "Udang Vaname",
-  "Kopi Arabika",
-];
-
 const STATUS_OPTIONS = ["Tersedia (Ready Stock)", "Segera Panen (Estimasi 7 Hari)"];
 
 export type FilterState = {
@@ -24,10 +16,12 @@ export function FilterPanel({
   filters,
   onChange,
   onApply,
+  komoditasOptions,
 }: {
   filters: FilterState;
   onChange: (filters: FilterState) => void;
   onApply: () => void;
+  komoditasOptions: string[];
 }) {
   const [draft, setDraft] = useState(filters);
 
@@ -94,7 +88,10 @@ export function FilterPanel({
             Komoditas Spesifik
           </span>
           <div className="flex flex-wrap gap-2">
-            {KOMODITAS_OPTIONS.map((name) => {
+            {komoditasOptions.length === 0 ? (
+              <span className="text-xs text-body">Belum ada komoditas.</span>
+            ) : null}
+            {komoditasOptions.map((name) => {
               const isActive = draft.komoditas.includes(name);
               return (
                 <button
