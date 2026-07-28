@@ -10,8 +10,9 @@ export function NearbyCooperativeCard() {
         </span>
       </div>
       <p className="text-sm text-body">
-        Penawaran ini akan otomatis dicocokkan dengan koperasi terdekat
-        berdasarkan komoditas, volume, dan lokasi Anda setelah dikirim.
+        Setelah dikirim, penawaran ini akan muncul di antrean Supply Matching
+        koperasi terdekat (dihitung dari komoditas, volume, dan lokasi Anda)
+        untuk ditinjau dan diterima oleh staf koperasi.
       </p>
     </div>
   );

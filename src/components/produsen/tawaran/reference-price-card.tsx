@@ -22,10 +22,7 @@ export function ReferencePriceCard({ komoditasRef }: { komoditasRef: string }) {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!komoditasRef) {
-      setData(null);
-      return;
-    }
+    if (!komoditasRef) return;
     setIsLoading(true);
     fetch(`/api/harga/rekomendasi?komoditas_ref=${encodeURIComponent(komoditasRef)}`)
       .then((res) => res.json())

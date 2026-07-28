@@ -3,16 +3,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Calendar, ChevronDown, FileText, Send } from "lucide-react";
+import { getAccessToken } from "@/lib/auth";
 
 type KomoditasOption = { komoditas_ref: string; nama_komoditas: string };
 
 export function OfferForm({
-  anggotaRef,
   komoditasOptions,
   selectedKomoditasRef,
   onKomoditasChange,
 }: {
-  anggotaRef: string;
   komoditasOptions: KomoditasOption[];
   selectedKomoditasRef: string;
   onKomoditasChange: (komoditasRef: string) => void;
@@ -36,11 +35,18 @@ export function OfferForm({
     setIsSubmitting(true);
 
     try {
+      const token = await getAccessToken();
+      if (!token) {
+        throw new Error("Sesi tidak ditemukan. Silakan masuk kembali.");
+      }
+
       const response = await fetch("/api/penawaran", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
-          anggota_ref: anggotaRef,
           komoditas_ref: selectedKomoditasRef,
           estimasi_volume: Number(volume),
           estimasi_tanggal_panen: tanggal,

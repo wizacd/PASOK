@@ -85,13 +85,13 @@ export function SidebarNav() {
       </div>
 
       <div className="flex flex-col gap-1 border-t border-border-soft px-4 pt-6">
-        <button
-          type="button"
+        <Link
+          href="/produsen/bantuan"
           className="flex items-center gap-3 rounded-xs px-3 py-2.5 text-left text-xs font-semibold tracking-[0.6px] text-body hover:bg-canvas"
         >
           <HelpCircle className="size-5" strokeWidth={2} />
           Pusat Bantuan
-        </button>
+        </Link>
         <button
           type="button"
           onClick={handleSignOut}

@@ -1,4 +1,7 @@
-import { Download, SlidersHorizontal } from "lucide-react";
+"use client";
+
+import { useMemo, useState } from "react";
+import { Download, Search } from "lucide-react";
 
 type OfferStatus = "tersedia" | "matched" | "terjual";
 
@@ -30,24 +33,79 @@ function formatRupiah(value: number) {
   }).format(value);
 }
 
+function exportCsv(offers: DashboardOffer[]) {
+  const header = ["ID Penawaran", "Komoditas", "Kuantitas (Kg)", "Harga Total", "Status"];
+  const rows = offers.map((offer) => {
+    const total =
+      offer.hargaDitawarkan != null && offer.estimasiVolume != null
+        ? offer.hargaDitawarkan * offer.estimasiVolume
+        : "";
+    return [
+      offer.id,
+      offer.namaKomoditas,
+      offer.estimasiVolume ?? "",
+      total,
+      STATUS_LABEL[offer.status],
+    ];
+  });
+  const csv = [header, ...rows].map((row) => row.join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `penawaran-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 export function ActiveOffersTable({ offers }: { offers: DashboardOffer[] }) {
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<OfferStatus | "semua">("semua");
+
+  const filteredOffers = useMemo(() => {
+    return offers.filter((offer) => {
+      if (statusFilter !== "semua" && offer.status !== statusFilter) return false;
+      if (search && !offer.namaKomoditas.toLowerCase().includes(search.toLowerCase())) {
+        return false;
+      }
+      return true;
+    });
+  }, [offers, search, statusFilter]);
+
   return (
     <div className="col-span-12 overflow-hidden rounded-sm border border-border-soft bg-white">
       <div className="flex items-center justify-between border-b border-border-soft bg-canvas/50 px-6 py-5">
         <h3 className="text-xl font-semibold text-ink">
           Daftar Penawaran Aktif
         </h3>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            className="flex items-center gap-2 rounded-xs border border-border-soft px-3 py-1.5 text-xs font-bold text-ink"
+        <div className="flex items-center gap-2">
+          <label className="flex items-center gap-2 rounded-xs border border-border-soft bg-white px-3 py-1.5">
+            <Search className="size-3 text-body" strokeWidth={2} />
+            <input
+              type="search"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Cari komoditas..."
+              className="w-32 bg-transparent text-xs text-ink placeholder:text-body/70 focus:outline-none"
+            />
+          </label>
+          <select
+            value={statusFilter}
+            onChange={(event) =>
+              setStatusFilter(event.target.value as OfferStatus | "semua")
+            }
+            className="rounded-xs border border-border-soft bg-white px-2 py-1.5 text-xs font-bold text-ink"
           >
-            <SlidersHorizontal className="size-3" strokeWidth={2} />
-            Filter
-          </button>
+            <option value="semua">Semua Status</option>
+            <option value="tersedia">Menunggu</option>
+            <option value="matched">Dicocokkan</option>
+            <option value="terjual">Terjual</option>
+          </select>
           <button
             type="button"
-            className="flex items-center gap-2 rounded-xs border border-border-soft px-3 py-1.5 text-xs font-bold text-ink"
+            onClick={() => exportCsv(filteredOffers)}
+            disabled={filteredOffers.length === 0}
+            className="flex items-center gap-2 rounded-xs border border-border-soft px-3 py-1.5 text-xs font-bold text-ink disabled:opacity-50"
           >
             <Download className="size-3" strokeWidth={2} />
             Export
@@ -67,14 +125,16 @@ export function ActiveOffersTable({ offers }: { offers: DashboardOffer[] }) {
             </tr>
           </thead>
           <tbody>
-            {offers.length === 0 ? (
+            {filteredOffers.length === 0 ? (
               <tr>
                 <td colSpan={5} className="px-6 py-8 text-center text-sm text-body">
-                  Belum ada penawaran. Buat penawaran pertama Anda.
+                  {offers.length === 0
+                    ? "Belum ada penawaran. Buat penawaran pertama Anda."
+                    : "Tidak ada penawaran yang cocok dengan pencarian/filter."}
                 </td>
               </tr>
             ) : (
-              offers.map((offer) => {
+              filteredOffers.map((offer) => {
                 const total =
                   offer.hargaDitawarkan != null && offer.estimasiVolume != null
                     ? offer.hargaDitawarkan * offer.estimasiVolume

@@ -1,6 +1,6 @@
 import { Lightbulb } from "lucide-react";
 
-export function QualityTipsCard() {
+export function QualityTipsCard({ namaKomoditas }: { namaKomoditas?: string }) {
   return (
     <div className="relative w-full overflow-hidden rounded-sm border border-brand/30 bg-forest/5 p-6">
       <div className="mb-3 flex items-center gap-2">
@@ -10,9 +10,10 @@ export function QualityTipsCard() {
         </span>
       </div>
       <p className="relative z-10 max-w-[85%] text-sm leading-relaxed text-ink">
-        Pastikan kadar air jagung di bawah 14% untuk mendapatkan harga premium
-        Grade A. Gunakan kemasan standar PASOK untuk mempercepat proses
-        logistik.
+        {namaKomoditas
+          ? `Pastikan kualitas dan kadar air ${namaKomoditas} sesuai standar untuk mendapatkan harga premium Grade A.`
+          : "Pilih komoditas terlebih dahulu untuk melihat tips kualitas."}{" "}
+        Gunakan kemasan standar PASOK untuk mempercepat proses logistik.
       </p>
       <Lightbulb
         aria-hidden

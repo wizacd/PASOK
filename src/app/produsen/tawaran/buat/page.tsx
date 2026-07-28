@@ -12,9 +12,11 @@ import { getAccessToken } from "@/lib/auth";
 type KomoditasOption = { komoditas_ref: string; nama_komoditas: string };
 
 export default function BuatTawaranPage() {
-  const [anggotaRef, setAnggotaRef] = useState("");
   const [komoditasOptions, setKomoditasOptions] = useState<KomoditasOption[]>([]);
   const [selectedKomoditasRef, setSelectedKomoditasRef] = useState("");
+  const selectedKomoditasNama = komoditasOptions.find(
+    (option) => option.komoditas_ref === selectedKomoditasRef,
+  )?.nama_komoditas;
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
@@ -37,8 +39,6 @@ export default function BuatTawaranPage() {
         setIsLoading(false);
         return;
       }
-
-      setAnggotaRef(me.anggota_ref);
 
       const komoditasResponse = await fetch(
         `/api/wilayah/komoditas?kode_wilayah=${encodeURIComponent(me.kode_wilayah)}`,
@@ -75,7 +75,6 @@ export default function BuatTawaranPage() {
         <div className="grid grid-cols-12 gap-8 pt-6">
           <div className="col-span-8">
             <OfferForm
-              anggotaRef={anggotaRef}
               komoditasOptions={komoditasOptions}
               selectedKomoditasRef={selectedKomoditasRef}
               onKomoditasChange={setSelectedKomoditasRef}
@@ -85,7 +84,7 @@ export default function BuatTawaranPage() {
           <div className="col-span-4 flex flex-col gap-6">
             <ReferencePriceCard komoditasRef={selectedKomoditasRef} />
             <NearbyCooperativeCard />
-            <QualityTipsCard />
+            <QualityTipsCard namaKomoditas={selectedKomoditasNama} />
           </div>
         </div>
       )}
