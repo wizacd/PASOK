@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 
 export type FrekuensiPanen = "harian" | "mingguan" | "bulanan" | "musiman";
+export type TipeUsaha = "" | "Petani" | "Nelayan" | "Lainnya";
 
 export type KomoditasSelection = {
   komoditasRef: string;
@@ -13,6 +14,7 @@ type ProdusenWizardState = {
   nama: string;
   email: string;
   password: string;
+  pekerjaan: TipeUsaha;
   komoditas: KomoditasSelection[];
   provinsi: string;
   kabKota: string;
@@ -38,6 +40,7 @@ const initialState: ProdusenWizardState = {
   nama: "",
   email: "",
   password: "",
+  pekerjaan: "",
   komoditas: [],
   provinsi: "",
   kabKota: "",

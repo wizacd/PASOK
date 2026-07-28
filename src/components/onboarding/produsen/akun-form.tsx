@@ -3,7 +3,16 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
-import { useProdusenWizard } from "@/components/onboarding/produsen/registration-wizard-context";
+import {
+  useProdusenWizard,
+  type TipeUsaha,
+} from "@/components/onboarding/produsen/registration-wizard-context";
+
+const TIPE_USAHA_OPTIONS: { id: TipeUsaha; label: string }[] = [
+  { id: "Petani", label: "Petani" },
+  { id: "Nelayan", label: "Nelayan" },
+  { id: "Lainnya", label: "Lainnya" },
+];
 
 export function AkunForm() {
   const router = useRouter();
@@ -11,8 +20,8 @@ export function AkunForm() {
   const [error, setError] = useState("");
 
   function handleNext() {
-    if (!wizard.nama || !wizard.email || !wizard.password) {
-      setError("Lengkapi nama, email, dan kata sandi terlebih dahulu.");
+    if (!wizard.nama || !wizard.email || !wizard.password || !wizard.pekerjaan) {
+      setError("Lengkapi nama, email, kata sandi, dan tipe usaha terlebih dahulu.");
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(wizard.email)) {
@@ -93,6 +102,32 @@ export function AkunForm() {
               onChange={(event) => wizard.setField("password", event.target.value)}
               className="h-12 w-full rounded-xs border border-border-soft px-4 text-base text-ink placeholder:text-body/70 focus:border-brand focus:outline-none"
             />
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label className="text-xs font-semibold tracking-[0.6px] text-body">
+            Tipe Usaha
+          </label>
+          <div className="flex gap-3">
+            {TIPE_USAHA_OPTIONS.map((option) => {
+              const isSelected = wizard.pekerjaan === option.id;
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  aria-pressed={isSelected}
+                  onClick={() => wizard.setField("pekerjaan", option.id)}
+                  className={`flex-1 rounded-xs border-2 px-4 py-3 text-center text-base font-semibold ${
+                    isSelected
+                      ? "border-brand bg-brand/10 text-brand"
+                      : "border-border-soft text-body"
+                  }`}
+                >
+                  {option.label}
+                </button>
+              );
+            })}
           </div>
         </div>
 

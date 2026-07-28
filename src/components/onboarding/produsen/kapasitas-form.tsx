@@ -54,6 +54,7 @@ export function KapasitasForm() {
           nama: wizard.nama,
           email: wizard.email,
           password: wizard.password,
+          pekerjaan: wizard.pekerjaan,
           kode_wilayah: wizard.kodeWilayah,
           lokasi_lat: wizard.lat,
           lokasi_lng: wizard.lng,
@@ -188,11 +189,12 @@ export function KapasitasForm() {
           </div>
           <div className="flex flex-col gap-1">
             <h4 className="text-xl font-semibold text-brand-deep">
-              Logistics Match-Making
+              Supply Matching
             </h4>
             <p className="text-sm leading-5 text-[#002f48]">
-              Sistem kami akan mencocokkan kapasitas Anda dengan armada logistik
-              terdekat secara otomatis setelah pendaftaran selesai.
+              Data kapasitas Anda akan muncul di antrean Supply Matching
+              koperasi terdekat setelah pendaftaran selesai, untuk ditinjau
+              dan diterima oleh staf koperasi.
             </p>
           </div>
         </div>

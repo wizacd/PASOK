@@ -44,6 +44,7 @@ export async function POST(request) {
     nama,
     email,
     password,
+    pekerjaan,
     kode_wilayah,
     lokasi_lat,
     lokasi_lng,
@@ -56,7 +57,7 @@ export async function POST(request) {
   } = body
 
   if (
-    !nama || !email || !password || !kode_wilayah ||
+    !nama || !email || !password || !pekerjaan || !kode_wilayah ||
     lokasi_lat == null || lokasi_lng == null ||
     !Array.isArray(komoditas) || komoditas.length === 0
   ) {
@@ -84,7 +85,7 @@ export async function POST(request) {
   // --- 2. Insert anggota_koperasi (koperasi_ref dikosongkan, di-assign lewat Supply Matching) ---
   const { data: anggota, error: errAnggota } = await supabase
     .from('anggota_koperasi')
-    .insert({ nama, kode_wilayah, user_id: userId })
+    .insert({ nama, pekerjaan, kode_wilayah, user_id: userId })
     .select()
     .single()
 

@@ -261,7 +261,7 @@ export function LokasiForm() {
       <div className="flex w-full items-center justify-between border-t border-border-soft pt-6">
         <button
           type="button"
-          onClick={() => router.push("/onboarding/produsen/komoditas")}
+          onClick={() => router.push("/onboarding/produsen")}
           className="flex items-center gap-3 rounded-xs border border-brand-deep px-10 py-4 text-xl font-semibold text-brand-deep"
         >
           <ArrowLeft className="size-4" strokeWidth={2.5} />
