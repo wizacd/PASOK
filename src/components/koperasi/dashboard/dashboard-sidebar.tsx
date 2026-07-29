@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   Map,
   Receipt,
+  Settings,
   Shuffle,
   type LucideIcon,
 } from "lucide-react";
@@ -33,6 +34,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   { href: "/koperasi/inventaris", label: "Inventaris", icon: Archive },
   { href: "/koperasi/analisa", label: "Analisa", icon: BarChart3 },
+  { href: "/koperasi/pengaturan", label: "Pengaturan", icon: Settings },
 ];
 
 export function DashboardSidebar() {
