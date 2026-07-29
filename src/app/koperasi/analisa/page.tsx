@@ -13,7 +13,7 @@ import {
 } from "@/components/koperasi/analisa/supply-forecast-chart";
 import { DashboardSidebar } from "@/components/koperasi/dashboard/dashboard-sidebar";
 import { DashboardTopBar } from "@/components/koperasi/dashboard/dashboard-top-bar";
-import { supabase } from "@/lib/supabase";
+import { getAccessToken } from "@/lib/auth";
 
 type KomoditasAnalisa = {
   komoditas_ref: string;
@@ -29,25 +29,14 @@ export default function AnalisaPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!session) return;
-
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("koperasi_ref")
-        .eq("id", session.user.id)
-        .single();
-
-      if (profileError || !profile?.koperasi_ref) {
-        setError("Tidak menemukan data koperasi untuk akun ini.");
-        setLoading(false);
-        return;
-      }
-
+    async function load() {
       try {
-        const response = await fetch(
-          `/api/koperasi/analisa?koperasi_ref=${profile.koperasi_ref}`,
-        );
+        const token = await getAccessToken();
+        if (!token) throw new Error("Sesi tidak ditemukan. Silakan masuk kembali.");
+
+        const response = await fetch("/api/koperasi/analisa", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error ?? "Gagal memuat data");
         setDaftarKomoditas(data.komoditas);
@@ -59,7 +48,8 @@ export default function AnalisaPage() {
       } finally {
         setLoading(false);
       }
-    });
+    }
+    load();
   }, []);
 
   const selected = useMemo(

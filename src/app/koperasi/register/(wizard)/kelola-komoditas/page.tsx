@@ -1,41 +1,60 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { Search } from "lucide-react";
 import {
-  CategoryToggle,
-  type CommodityCategory,
-} from "@/components/koperasi/register/category-toggle";
-import {
-  COMMODITIES,
   CommoditySelectionGrid,
+  type KomoditasOption,
 } from "@/components/koperasi/register/commodity-selection-grid";
 import { useRegistrationWizard } from "@/components/koperasi/register/registration-wizard-context";
 import { RegistrationStepper } from "@/components/koperasi/register/registration-stepper";
 import { SelectionSummaryCard } from "@/components/koperasi/register/selection-summary-card";
 import { StepActionsFooter } from "@/components/koperasi/register/step-actions-footer";
+import { getAccessToken } from "@/lib/auth";
 
 export default function KelolaKomoditasPage() {
   const router = useRouter();
   const wizard = useRegistrationWizard();
-  const [category, setCategory] = useState<CommodityCategory>("pertanian");
+  const [komoditasOptions, setKomoditasOptions] = useState<KomoditasOption[]>([]);
+  const [isLoadingKomoditas, setIsLoadingKomoditas] = useState(true);
+  const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  function handleToggle(id: string) {
+  useEffect(() => {
+    if (!wizard.wilayah?.kodeWilayah) {
+      setIsLoadingKomoditas(false);
+      return;
+    }
+    fetch(`/api/wilayah/komoditas?kode_wilayah=${encodeURIComponent(wizard.wilayah.kodeWilayah)}`)
+      .then((res) => res.json())
+      .then((data) => setKomoditasOptions(Array.isArray(data) ? data : []))
+      .finally(() => setIsLoadingKomoditas(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wizard.wilayah?.kodeWilayah]);
+
+  function handleToggle(komoditasRef: string) {
     setSelected((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
+      prev.includes(komoditasRef)
+        ? prev.filter((item) => item !== komoditasRef)
+        : [...prev, komoditasRef],
     );
   }
 
+  const filteredOptions = useMemo(
+    () =>
+      komoditasOptions.filter((item) =>
+        item.nama_komoditas.toLowerCase().includes(search.toLowerCase()),
+      ),
+    [komoditasOptions, search],
+  );
+
   const selectedCommodities = selected
-    .map((id) => COMMODITIES[category].find((item) => item.id === id))
-    .filter((item): item is (typeof COMMODITIES)["pertanian"][number] =>
-      Boolean(item),
-    );
-  const selectedLabels = selectedCommodities.map((item) => item.label);
+    .map((ref) => komoditasOptions.find((item) => item.komoditas_ref === ref))
+    .filter((item): item is KomoditasOption => Boolean(item));
+  const selectedLabels = selectedCommodities.map((item) => item.nama_komoditas);
 
   async function handleNext() {
     if (!wizard.koperasiRef) {
@@ -49,16 +68,23 @@ export default function KelolaKomoditasPage() {
     setIsSubmitting(true);
 
     try {
+      const token = await getAccessToken();
+      if (!token) {
+        throw new Error("Sesi tidak ditemukan. Silakan masuk kembali.");
+      }
+
       if (selectedCommodities.length > 0) {
         const responses = await Promise.all(
           selectedCommodities.map((item) =>
             fetch("/api/koperasi/produk", {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
               body: JSON.stringify({
-                koperasi_ref: wizard.koperasiRef,
-                nama_produk: item.label,
-                unit: item.unit,
+                nama_produk: item.nama_komoditas,
+                unit: "Kg",
               }),
             }),
           ),
@@ -91,19 +117,12 @@ export default function KelolaKomoditasPage() {
 
       <div className="grid w-full grid-cols-12 gap-6">
         <div className="col-span-8 flex flex-col gap-8">
-          <div className="flex flex-col gap-4 rounded-sm border border-border-soft bg-white p-6">
-            <h2 className="text-xl font-semibold text-ink">
-              Pilih Kategori Utama
-            </h2>
-            <CategoryToggle selected={category} onSelect={setCategory} />
-          </div>
-
           <div className="flex flex-col gap-6 rounded-sm border border-border-soft bg-white p-6">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold text-ink">
                 Daftar Komoditas{" "}
                 <span className="text-info">
-                  ({category === "pertanian" ? "Pertanian" : "Kelautan"})
+                  {wizard.wilayah ? `(${wizard.wilayah.label})` : ""}
                 </span>
               </h2>
               <div className="relative">
@@ -113,17 +132,25 @@ export default function KelolaKomoditasPage() {
                 />
                 <input
                   type="text"
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
                   placeholder="Cari komoditas..."
                   className="h-11 w-64 rounded-xs border border-border-soft bg-white pl-10 pr-4 text-sm text-ink placeholder:text-body/70 focus:border-info focus:outline-none"
                 />
               </div>
             </div>
 
-            <CommoditySelectionGrid
-              category={category}
-              selected={selected}
-              onToggle={handleToggle}
-            />
+            {isLoadingKomoditas ? (
+              <p className="py-8 text-center text-sm text-body">
+                Memuat komoditas untuk wilayah Anda...
+              </p>
+            ) : (
+              <CommoditySelectionGrid
+                komoditasOptions={filteredOptions}
+                selected={selected}
+                onToggle={handleToggle}
+              />
+            )}
           </div>
         </div>
 

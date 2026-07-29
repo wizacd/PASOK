@@ -9,7 +9,7 @@ export function StepActionsFooter({
   nextLabel = "Lanjutkan",
   onNext,
   nextDisabled,
-  helperText = "Data tersimpan otomatis",
+  helperText = "",
 }: {
   backHref?: string;
   nextHref?: string;

@@ -1,14 +1,13 @@
-import { createClient } from '@supabase/supabase-js'
+import { getKoperasiFromRequest } from '@/lib/server-auth'
 import { hitungSkorMatching } from '@/lib/supply_matching'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SECRET_KEY
-)
-
 export async function GET(request) {
-  const { searchParams } = new URL(request.url)
-  const koperasi_ref = searchParams.get('koperasi_ref')
+  const result = await getKoperasiFromRequest(request)
+  if (result.error) {
+    return Response.json({ error: result.error }, { status: result.status })
+  }
+
+  const { koperasi_ref, supabase } = result
 
   const { data: koperasiRow, error: errKop } = await supabase
     .from('profil_koperasi')
@@ -33,6 +32,13 @@ export async function GET(request) {
     .eq('kode_wilayah', kodeWilayah)
   const daftarKomoditasDibutuhkan = komoditasWilayah.map(k => k.nama_komoditas)
 
+  const { data: ditolakRows } = await supabase
+    .from('matching')
+    .select('penawaran_id')
+    .eq('koperasi_ref', koperasi_ref)
+    .eq('status', 'ditolak')
+  const penawaranDitolak = new Set((ditolakRows ?? []).map(r => r.penawaran_id))
+
   const { data: penawaranList, error: errPenawaran } = await supabase
     .from('penawaran')
     .select(`
@@ -45,6 +51,7 @@ export async function GET(request) {
 
   const hasil = penawaranList
     .filter(p => p.anggota_koperasi?.anggota_lokasi)
+    .filter(p => !penawaranDitolak.has(p.id))
     .map(p => {
       const skor = hitungSkorMatching({
         lokasiProdusen: { lat: p.anggota_koperasi.anggota_lokasi.lokasi_lat, lon: p.anggota_koperasi.anggota_lokasi.lokasi_lng },

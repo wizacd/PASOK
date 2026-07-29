@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -12,6 +13,7 @@ import {
   Shuffle,
   type LucideIcon,
 } from "lucide-react";
+import { getAccessToken } from "@/lib/auth";
 
 type NavItem = {
   href: string;
@@ -35,6 +37,21 @@ const NAV_ITEMS: NavItem[] = [
 
 export function DashboardSidebar() {
   const pathname = usePathname();
+  const [totalStokKg, setTotalStokKg] = useState<number | null>(null);
+
+  useEffect(() => {
+    async function load() {
+      const token = await getAccessToken();
+      if (!token) return;
+      const response = await fetch("/api/koperasi/inventaris", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!response.ok) return;
+      const data = await response.json();
+      setTotalStokKg(data.ringkasan?.totalVolumeKg ?? 0);
+    }
+    load();
+  }, []);
 
   return (
     <aside className="sticky top-0 flex h-screen w-64 shrink-0 flex-col justify-between border-r border-border-soft bg-[#f8f9ff] py-6">
@@ -74,13 +91,13 @@ export function DashboardSidebar() {
       <div className="flex flex-col gap-2 px-4">
         <div className="flex flex-col gap-2 rounded-xl border border-info/10 bg-info/5 p-[17px]">
           <span className="text-[11px] font-bold text-info">
-            PENGGUNAAN STORAGE
+            STOK GUDANG SAAT INI
           </span>
-          <div className="h-1.5 w-full rounded-full bg-border-soft/40">
-            <div className="h-1.5 w-[72%] rounded-full bg-info" />
-          </div>
+          <span className="text-base font-bold text-ink">
+            {totalStokKg !== null ? totalStokKg.toLocaleString("id-ID") : "..."} Kg
+          </span>
           <span className="text-[11px] text-body">
-            720 Ton dari 1,000 Ton
+            Total stok yang sudah diterima dan tercatat.
           </span>
         </div>
       </div>

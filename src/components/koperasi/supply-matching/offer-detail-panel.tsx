@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Sparkles, Truck } from "lucide-react";
 import type { MatchedOffer } from "@/components/koperasi/supply-matching/offer-queue-panel";
+import { getAccessToken } from "@/lib/auth";
 
 type HargaRekomendasi = {
   nama_komoditas: string;
@@ -18,16 +19,15 @@ function formatRupiah(value: number) {
 
 export function OfferDetailPanel({
   offer,
-  koperasiRef,
-  onAccepted,
+  onResolved,
 }: {
   offer: MatchedOffer | null;
-  koperasiRef: string;
-  onAccepted: () => void;
+  onResolved: () => void;
 }) {
   const [harga, setHarga] = useState<HargaRekomendasi | null>(null);
   const [hargaError, setHargaError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRejecting, setIsRejecting] = useState(false);
   const [actionError, setActionError] = useState("");
 
   useEffect(() => {
@@ -50,22 +50,54 @@ export function OfferDetailPanel({
     setActionError("");
 
     try {
+      const token = await getAccessToken();
+      if (!token) throw new Error("Sesi tidak ditemukan. Silakan masuk kembali.");
+
       const response = await fetch("/api/koperasi/matching/terima", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           penawaran_id: offer.id,
-          koperasi_ref: koperasiRef,
           skor_matching: offer.skor_total,
         }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Gagal menerima penawaran");
-      onAccepted();
+      onResolved();
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "Terjadi kesalahan");
     } finally {
       setIsSubmitting(false);
+    }
+  }
+
+  async function handleTolak() {
+    if (!offer) return;
+    setIsRejecting(true);
+    setActionError("");
+
+    try {
+      const token = await getAccessToken();
+      if (!token) throw new Error("Sesi tidak ditemukan. Silakan masuk kembali.");
+
+      const response = await fetch("/api/koperasi/matching/tolak", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ penawaran_id: offer.id }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error ?? "Gagal menolak penawaran");
+      onResolved();
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Terjadi kesalahan");
+    } finally {
+      setIsRejecting(false);
     }
   }
 
@@ -246,22 +278,18 @@ export function OfferDetailPanel({
         <button
           type="button"
           onClick={handleTerima}
-          disabled={isSubmitting}
+          disabled={isSubmitting || isRejecting}
           className="rounded-xs bg-info px-8 py-3 text-base font-bold text-white disabled:opacity-50"
         >
           {isSubmitting ? "Memproses..." : "Terima Penawaran"}
         </button>
         <button
           type="button"
-          className="rounded-xs border border-body px-8 py-3 text-base font-bold text-ink"
+          onClick={handleTolak}
+          disabled={isSubmitting || isRejecting}
+          className="rounded-xs px-8 py-3 text-base font-bold text-danger disabled:opacity-50"
         >
-          Nego
-        </button>
-        <button
-          type="button"
-          className="rounded-xs px-8 py-3 text-base font-bold text-danger"
-        >
-          Tolak
+          {isRejecting ? "Memproses..." : "Tolak"}
         </button>
       </div>
     </div>

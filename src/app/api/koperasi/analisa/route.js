@@ -1,18 +1,12 @@
-import { createClient } from '@supabase/supabase-js'
+import { getKoperasiFromRequest } from '@/lib/server-auth'
 import { hitungHargaRekomendasi } from '@/lib/harga'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SECRET_KEY
-)
-
 export async function GET(request) {
-  const { searchParams } = new URL(request.url)
-  const koperasi_ref = searchParams.get('koperasi_ref')
-
-  if (!koperasi_ref) {
-    return Response.json({ error: 'koperasi_ref wajib diisi' }, { status: 400 })
+  const result = await getKoperasiFromRequest(request)
+  if (result.error) {
+    return Response.json({ error: result.error }, { status: result.status })
   }
+  const { koperasi_ref, supabase } = result
 
   const { data: koperasiRow, error: errKop } = await supabase
     .from('profil_koperasi')

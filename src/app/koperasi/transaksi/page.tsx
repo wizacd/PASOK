@@ -13,7 +13,7 @@ import {
   TransactionLedgerTable,
   type TransaksiSelesai,
 } from "@/components/koperasi/transaksi/transaction-ledger-table";
-import { supabase } from "@/lib/supabase";
+import { getAccessToken } from "@/lib/auth";
 
 export default function TransaksiPage() {
   const [items, setItems] = useState<TransaksiSelesai[]>([]);
@@ -24,25 +24,14 @@ export default function TransaksiPage() {
   const totalVolumeKg = items.reduce((sum, i) => sum + i.volume_kg, 0);
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!session) return;
-
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("koperasi_ref")
-        .eq("id", session.user.id)
-        .single();
-
-      if (profileError || !profile?.koperasi_ref) {
-        setError("Tidak menemukan data koperasi untuk akun ini.");
-        setLoading(false);
-        return;
-      }
-
+    async function load() {
       try {
-        const response = await fetch(
-          `/api/koperasi/transaksi-selesai?koperasi_ref=${profile.koperasi_ref}`,
-        );
+        const token = await getAccessToken();
+        if (!token) throw new Error("Sesi tidak ditemukan. Silakan masuk kembali.");
+
+        const response = await fetch("/api/koperasi/transaksi-selesai", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error ?? "Gagal memuat data");
         setItems(data.items);
@@ -52,7 +41,8 @@ export default function TransaksiPage() {
       } finally {
         setLoading(false);
       }
-    });
+    }
+    load();
   }, []);
 
   return (

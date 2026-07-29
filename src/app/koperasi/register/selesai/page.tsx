@@ -97,13 +97,13 @@ export default async function PendaftaranSelesaiPage({
               <LayoutDashboard className="size-[18px]" strokeWidth={2} />
               Buka Dashboard Utama
             </Link>
-            <button
-              type="button"
+            <Link
+              href="/koperasi/bantuan"
               className="flex flex-1 items-center justify-center gap-2 rounded-xs border border-border-soft bg-white px-8 py-4 text-base text-body"
             >
               <BookOpen className="size-[18px]" strokeWidth={2} />
               Lihat Panduan
-            </button>
+            </Link>
           </div>
         </div>
       </main>

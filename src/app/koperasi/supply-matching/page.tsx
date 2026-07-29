@@ -9,10 +9,9 @@ import {
   type MatchedOffer,
 } from "@/components/koperasi/supply-matching/offer-queue-panel";
 import { OfferDetailPanel } from "@/components/koperasi/supply-matching/offer-detail-panel";
-import { supabase } from "@/lib/supabase";
+import { getAccessToken } from "@/lib/auth";
 
 export default function SupplyMatchingPage() {
-  const [koperasiRef, setKoperasiRef] = useState<string | null>(null);
   const [offers, setOffers] = useState<MatchedOffer[]>([]);
   const [selectedOffer, setSelectedOffer] = useState<MatchedOffer | null>(
     null,
@@ -20,14 +19,17 @@ export default function SupplyMatchingPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  async function loadOffers(ref: string) {
+  async function loadOffers() {
     setLoading(true);
     setError("");
 
     try {
-      const response = await fetch(
-        `/api/koperasi/matching?koperasi_ref=${ref}`,
-      );
+      const token = await getAccessToken();
+      if (!token) throw new Error("Sesi tidak ditemukan. Silakan masuk kembali.");
+
+      const response = await fetch("/api/koperasi/matching", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Gagal memuat data");
       setOffers(data);
@@ -42,25 +44,7 @@ export default function SupplyMatchingPage() {
   }
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!session) return;
-
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("koperasi_ref")
-        .eq("id", session.user.id)
-        .single();
-
-      if (profileError || !profile?.koperasi_ref) {
-        setError("Tidak menemukan data koperasi untuk akun ini.");
-        setLoading(false);
-        return;
-      }
-
-      setKoperasiRef(profile.koperasi_ref);
-      loadOffers(profile.koperasi_ref);
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    loadOffers();
   }, []);
 
   return (
@@ -81,8 +65,10 @@ export default function SupplyMatchingPage() {
             />
             <OfferDetailPanel
               offer={selectedOffer}
-              koperasiRef={koperasiRef ?? ""}
-              onAccepted={() => koperasiRef && loadOffers(koperasiRef)}
+              onResolved={() => {
+                setSelectedOffer(null);
+                loadOffers();
+              }}
             />
           </div>
         </div>

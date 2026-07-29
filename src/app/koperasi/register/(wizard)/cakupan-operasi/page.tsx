@@ -5,10 +5,10 @@ import { useState } from "react";
 import { CoverageMapCard } from "@/components/koperasi/register/coverage-map-card";
 import { CoverageSummaryCard } from "@/components/koperasi/register/coverage-summary-card";
 import { EfficiencyTipsCard } from "@/components/koperasi/register/efficiency-tips-card";
-import { LogisticsHubTable } from "@/components/koperasi/register/logistics-hub-table";
 import { useRegistrationWizard } from "@/components/koperasi/register/registration-wizard-context";
 import { RegistrationStepper } from "@/components/koperasi/register/registration-stepper";
 import { StepActionsFooter } from "@/components/koperasi/register/step-actions-footer";
+import { signIn } from "@/lib/auth";
 
 export default function CakupanOperasiPage() {
   const router = useRouter();
@@ -70,6 +70,7 @@ export default function CakupanOperasiPage() {
       }
 
       wizard.setField("koperasiRef", result.koperasi_ref);
+      await signIn(wizard.email, wizard.password);
       router.push("/koperasi/register/kelola-komoditas");
     } catch (err) {
       setError(
@@ -87,7 +88,6 @@ export default function CakupanOperasiPage() {
       <div className="grid w-full grid-cols-12 gap-6">
         <div className="col-span-8 flex flex-col gap-6">
           <CoverageMapCard />
-          <LogisticsHubTable />
         </div>
         <div className="col-span-4 flex flex-col gap-6">
           <CoverageSummaryCard />

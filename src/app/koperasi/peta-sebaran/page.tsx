@@ -16,7 +16,7 @@ import {
   type ProducerPin,
 } from "@/components/koperasi/peta-sebaran/producer-data";
 import { ProducerDetailDrawer } from "@/components/koperasi/peta-sebaran/producer-detail-drawer";
-import { supabase } from "@/lib/supabase";
+import { getAccessToken } from "@/lib/auth";
 
 const DistributionMap = dynamic(
   () =>
@@ -41,25 +41,14 @@ export default function PetaSebaranPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!session) return;
-
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("koperasi_ref")
-        .eq("id", session.user.id)
-        .single();
-
-      if (profileError || !profile?.koperasi_ref) {
-        setError("Tidak menemukan data koperasi untuk akun ini.");
-        setLoading(false);
-        return;
-      }
-
+    async function load() {
       try {
-        const response = await fetch(
-          `/api/koperasi/peta?koperasi_ref=${profile.koperasi_ref}`,
-        );
+        const token = await getAccessToken();
+        if (!token) throw new Error("Sesi tidak ditemukan. Silakan masuk kembali.");
+
+        const response = await fetch("/api/koperasi/peta", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const data: PenawaranPeta[] = await response.json();
         if (!response.ok) throw new Error("Gagal memuat data peta");
         setPins(
@@ -72,7 +61,8 @@ export default function PetaSebaranPage() {
       } finally {
         setLoading(false);
       }
-    });
+    }
+    load();
   }, []);
 
   const komoditasOptions = useMemo(

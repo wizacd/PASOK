@@ -1,26 +1,22 @@
-import { ChevronRight, Download, ListChecks, UserCog } from "lucide-react";
+import Link from "next/link";
+import { ChevronRight, LayoutDashboard, ListChecks } from "lucide-react";
 
 const NEXT_STEPS = [
   {
-    icon: UserCog,
-    iconBgClassName: "bg-info/10",
-    iconClassName: "text-info",
-    title: "Lengkapi Profil Detail",
-    description: "Tambahkan data pengurus dan armada.",
-  },
-  {
+    href: "/koperasi/supply-matching",
     icon: ListChecks,
     iconBgClassName: "bg-success/10",
     iconClassName: "text-success",
     title: "Mulai Terima Tawaran",
-    description: "Aktifkan notifikasi penawaran produsen.",
+    description: "Lihat penawaran produsen yang cocok dengan wilayah Anda.",
   },
   {
-    icon: Download,
-    iconBgClassName: "bg-warning/10",
-    iconClassName: "text-warning",
-    title: "Unduh Sertifikat Kemitraan",
-    description: "Simpan dokumen bukti registrasi Anda.",
+    href: "/koperasi",
+    icon: LayoutDashboard,
+    iconBgClassName: "bg-info/10",
+    iconClassName: "text-info",
+    title: "Buka Dashboard Operasional",
+    description: "Pantau ringkasan stok, transaksi, dan aktivitas terbaru.",
   },
 ];
 
@@ -31,10 +27,10 @@ export function NextStepsCard() {
 
       <div className="flex flex-col gap-4">
         {NEXT_STEPS.map(
-          ({ icon: Icon, iconBgClassName, iconClassName, title, description }) => (
-            <button
+          ({ href, icon: Icon, iconBgClassName, iconClassName, title, description }) => (
+            <Link
               key={title}
-              type="button"
+              href={href}
               className="flex w-full items-center gap-4 rounded-sm border border-border-soft p-[17px] text-left"
             >
               <div
@@ -51,7 +47,7 @@ export function NextStepsCard() {
                 </span>
               </div>
               <ChevronRight className="size-3 shrink-0 text-body" strokeWidth={2} />
-            </button>
+            </Link>
           ),
         )}
       </div>

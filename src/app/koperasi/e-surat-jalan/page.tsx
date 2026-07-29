@@ -10,12 +10,11 @@ import {
   type TransaksiDiterima,
 } from "@/components/koperasi/surat-jalan/transaction-summary-card";
 import { WaybillPreview } from "@/components/koperasi/surat-jalan/waybill-preview";
-import { supabase } from "@/lib/supabase";
+import { getAccessToken } from "@/lib/auth";
 
 const GRADE_OPTIONS = ["Grade A", "Grade B", "Grade C"];
 
 export default function ESuratJalanPage() {
-  const [koperasiRef, setKoperasiRef] = useState<string | null>(null);
   const [namaKoperasi, setNamaKoperasi] = useState("Koperasi");
   const [alamatKoperasi, setAlamatKoperasi] = useState("");
 
@@ -46,44 +45,26 @@ export default function ESuratJalanPage() {
     selectedSnapshot?.matching_id === selectedId ? selectedSnapshot : null;
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!session) return;
-
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("koperasi_ref")
-        .eq("id", session.user.id)
-        .single();
-
-      if (profileError || !profile?.koperasi_ref) {
-        setError("Tidak menemukan data koperasi untuk akun ini.");
-        setLoading(false);
-        return;
-      }
-
-      setKoperasiRef(profile.koperasi_ref);
-
-      const { data: koperasiRow } = await supabase
-        .from("profil_koperasi")
-        .select("nama_koperasi, alamat_lengkap")
-        .eq("koperasi_ref", profile.koperasi_ref)
-        .single();
-      if (koperasiRow?.nama_koperasi) setNamaKoperasi(koperasiRow.nama_koperasi);
-      if (koperasiRow?.alamat_lengkap) setAlamatKoperasi(koperasiRow.alamat_lengkap);
-
+    async function load() {
       try {
-        const response = await fetch(
-          `/api/koperasi/transaksi-diterima?koperasi_ref=${profile.koperasi_ref}`,
-        );
+        const token = await getAccessToken();
+        if (!token) throw new Error("Sesi tidak ditemukan. Silakan masuk kembali.");
+
+        const response = await fetch("/api/koperasi/transaksi-diterima", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error ?? "Gagal memuat data");
         setDaftarTransaksi(data.items);
+        if (data.koperasi?.nama_koperasi) setNamaKoperasi(data.koperasi.nama_koperasi);
+        if (data.koperasi?.alamat_lengkap) setAlamatKoperasi(data.koperasi.alamat_lengkap);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Terjadi kesalahan");
       } finally {
         setLoading(false);
       }
-    });
+    }
+    load();
   }, []);
 
   function handleSelect(matchingId: string) {
@@ -100,9 +81,15 @@ export default function ESuratJalanPage() {
     setSubmitting(true);
     setSubmitError("");
     try {
+      const token = await getAccessToken();
+      if (!token) throw new Error("Sesi tidak ditemukan. Silakan masuk kembali.");
+
       const response = await fetch("/api/koperasi/surat-jalan", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           matching_id: selected.matching_id,
           driver,

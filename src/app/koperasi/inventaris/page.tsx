@@ -14,7 +14,7 @@ import {
   InventoryDetailTable,
   type InventoryItem,
 } from "@/components/koperasi/inventaris/inventory-detail-table";
-import { supabase } from "@/lib/supabase";
+import { getAccessToken } from "@/lib/auth";
 
 type Ringkasan = {
   totalVolumeKg: number;
@@ -45,25 +45,14 @@ export default function InventarisPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!session) return;
-
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("koperasi_ref")
-        .eq("id", session.user.id)
-        .single();
-
-      if (profileError || !profile?.koperasi_ref) {
-        setError("Tidak menemukan data koperasi untuk akun ini.");
-        setLoading(false);
-        return;
-      }
-
+    async function load() {
       try {
-        const response = await fetch(
-          `/api/koperasi/inventaris?koperasi_ref=${profile.koperasi_ref}`,
-        );
+        const token = await getAccessToken();
+        if (!token) throw new Error("Sesi tidak ditemukan. Silakan masuk kembali.");
+
+        const response = await fetch("/api/koperasi/inventaris", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error ?? "Gagal memuat data");
         setItems(data.items);
@@ -73,7 +62,8 @@ export default function InventarisPage() {
       } finally {
         setLoading(false);
       }
-    });
+    }
+    load();
   }, []);
 
   return (

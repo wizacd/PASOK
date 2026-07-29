@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Handshake, Package, Users, Wallet } from "lucide-react";
 import { RequireAuth } from "@/components/auth/require-auth";
 import { DashboardSidebar } from "@/components/koperasi/dashboard/dashboard-sidebar";
@@ -20,8 +19,7 @@ import {
   VolumeTrendChart,
   type TrendHarian,
 } from "@/components/koperasi/dashboard/volume-trend-chart";
-import { signOut } from "@/lib/auth";
-import { supabase } from "@/lib/supabase";
+import { getAccessToken } from "@/lib/auth";
 
 type Ringkasan = {
   totalVolumeDiterimaKg: number;
@@ -45,8 +43,6 @@ function formatRupiahRingkas(value: number) {
 }
 
 export default function KoperasiDashboardPage() {
-  const router = useRouter();
-
   const [ringkasan, setRingkasan] = useState<Ringkasan | null>(null);
   const [trendMingguan, setTrendMingguan] = useState<TrendHarian[]>([]);
   const [aktivitasTerbaru, setAktivitasTerbaru] = useState<AktivitasMatching[]>([]);
@@ -57,25 +53,18 @@ export default function KoperasiDashboardPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!session) return;
-
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("koperasi_ref")
-        .eq("id", session.user.id)
-        .single();
-
-      if (profileError || !profile?.koperasi_ref) {
-        setError("Tidak menemukan data koperasi untuk akun ini.");
+    async function load() {
+      const token = await getAccessToken();
+      if (!token) {
+        setError("Sesi tidak ditemukan. Silakan masuk kembali.");
         setLoading(false);
         return;
       }
 
       try {
-        const response = await fetch(
-          `/api/koperasi/dashboard?koperasi_ref=${profile.koperasi_ref}`,
-        );
+        const response = await fetch("/api/koperasi/dashboard", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error ?? "Gagal memuat data");
         setRingkasan(data.ringkasan);
@@ -87,13 +76,9 @@ export default function KoperasiDashboardPage() {
       } finally {
         setLoading(false);
       }
-    });
+    }
+    load();
   }, []);
-
-  async function handleLogout() {
-    await signOut();
-    router.push("/login");
-  }
 
   return (
     <RequireAuth role="koperasi">
@@ -179,14 +164,6 @@ export default function KoperasiDashboardPage() {
                 <LatestOffersTable items={aktivitasTerbaru} />
               </>
             )}
-
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="w-fit rounded-xs bg-brand-deep px-6 py-3 text-white"
-            >
-              Keluar
-            </button>
           </main>
         </div>
       </div>
