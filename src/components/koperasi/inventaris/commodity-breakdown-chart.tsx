@@ -26,11 +26,13 @@ export function CommodityBreakdownChart({
   data: KomoditasBreakdown[];
   totalVolumeKg: number;
 }) {
-  let cursor = 0;
+  const cumulativePersen = data.reduce<number[]>(
+    (acc, item) => [...acc, (acc.at(-1) ?? 0) + item.persen],
+    [],
+  );
   const stops = data.map((item, index) => {
-    const start = cursor;
-    const end = cursor + item.persen;
-    cursor = end;
+    const start = cumulativePersen[index] - item.persen;
+    const end = cumulativePersen[index];
     return `${SEGMENT_COLORS[index % SEGMENT_COLORS.length]} ${start}% ${end}%`;
   });
   const gradient =
